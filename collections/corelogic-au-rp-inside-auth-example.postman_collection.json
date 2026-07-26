@@ -1,0 +1,1130 @@
+{
+    "info": {
+        "_postman_id": "772619ea-d42a-4f82-bc66-be85e7bf6d46",
+        "name": "CL RP.Inside Auth Example",
+        "description": "# RP Inside Authentication\n\nThis collection demonstrates OAuth Authorization and Application Silent login as documented on [https://developer.corelogic.asia/apis/guides/application-silent-login-au-nz](https://developer.corelogic.asia/apis/guides/application-silent-login-au-nz)\n\n### Get Started\n\nSet the credentials in the Pre-request Script of this collection.\n\n> You may need to configure Postman Cookies \"Domains Allowlist\" to add the authentication domains:\n\n- UAT access-uat-api.corelogic.asia\n- Production access-api.corelogic.asia",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "OAuth authorization code grant",
+            "item": [
+                {
+                    "name": "1. Get Code - save session cookie",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "const contentType = pm.response.headers.get('Content-Type');",
+                                    "const sessionCookie =  pm.cookies.get(\"session\");",
+                                    "if (sessionCookie) {",
+                                    "    console.log(\"Session cookie? \", sessionCookie);",
+                                    "    pm.globals.set('session', sessionCookie);",
+                                    "}",
+                                    "",
+                                    "// if the session is already logged-in it will redirect already! ",
+                                    "// if follow redirects is on - the code should be on the query string",
+                                    "let reqParams = pm.request.url.getQueryString();",
+                                    "// Follow redirects off - ?code=aaaa should be in the redirect header",
+                                    "const location = pm.response.headers.get('location');",
+                                    "console.log(\"Request params? \", reqParams, \" Location ? \", location);",
+                                    "if (location && location.indexOf('code=') > -1) {",
+                                    "    let params = location.split('?')",
+                                    "    const querystring = require('querystring');",
+                                    "    const codeParam = querystring.parse(params[1]);",
+                                    "    console.log(\"Location Code? \", codeParam);",
+                                    "    pm.globals.set(\"code\", codeParam.code);",
+                                    "}",
+                                    "",
+                                    "// Only if follow redirects are on..",
+                                    "pm.test(\"Login is for valid application\", function () {",
+                                    "    pm.response.to.have.header(\"x-cl-app-key\");",
+                                    "    pm.response.to.be.header(\"x-cl-app-key\", pm.collectionVariables.get('client-app-key'));",
+                                    "});",
+                                    "",
+                                    "// Postman settings follow redirects on - if we are already fully logged in - we wil be forwarded ",
+                                    "pm.test(\"Login is not partially or fully complete\", function () {",
+                                    "    // check we are still on the login ",
+                                    "    ",
+                                    "    pm.expect(pm.request.url.toString()).contains(\"https://access\");",
+                                    "});",
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "protocolProfileBehavior": {
+                        "disableCookies": false,
+                        "followRedirects": true
+                    },
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://access-uat-api.corelogic.asia/access/oauth/authorize?response_type=code&client_id={{client-id}}&redirect_uri={{client-redirect-uri}}&scope=openid",
+                            "host": [
+                                "https://access-uat-api.corelogic.asia"
+                            ],
+                            "path": [
+                                "access",
+                                "oauth",
+                                "authorize"
+                            ],
+                            "query": [
+                                {
+                                    "key": "response_type",
+                                    "value": "code"
+                                },
+                                {
+                                    "key": "client_id",
+                                    "value": "{{client-id}}",
+                                    "description": "See collection variables"
+                                },
+                                {
+                                    "key": "redirect_uri",
+                                    "value": "{{client-redirect-uri}}"
+                                },
+                                {
+                                    "key": "scope",
+                                    "value": "openid"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Login user/pass",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "",
+                                    "const querystring = require('querystring');",
+                                    "let codeParam = '';",
+                                    "// if follow redirects is on - the code should be on the query string",
+                                    "// if follow redirects is off - the code=?? may be available from the location header",
+                                    "const location = pm.response.headers.get('location');",
+                                    "console.log(\"Location? \", location);",
+                                    "",
+                                    "// first - check if the authentication was a success",
+                                    "if (location && location.indexOf('error=') > -1) {",
+                                    "",
+                                    "    let params = location.split('?')",
+                                    "    const err = querystring.parse(params[1]);",
+                                    "    console.log(\"Error? \", err);",
+                                    "",
+                                    "} else if (location && location.indexOf('code=') > -1) {",
+                                    "    console.log(\"Location? \", location);",
+                                    "    let params = location.split('?')",
+                                    "    const codeParam = querystring.parse(params[1]);",
+                                    "    console.log(\"Location Code? \", codeParam);",
+                                    "    pm.globals.set(\"code\", codeParam.code);",
+                                    "}",
+                                    "",
+                                    "// Extracting the authoriation code depends entirely on the authorization redirect callback..",
+                                    "// If it's on the redirected URL we cannot grab it in Postman",
+                                    "// Execute Step 2.a. - Get code for existing session.",
+                                    "",
+                                    "pm.test(\"Login username and password OK\", function () {",
+                                    "   pm.expect(pm.response.body).does.not.match(/error/);",
+                                    "});",
+                                    "",
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "protocolProfileBehavior": {
+                        "followRedirects": true
+                    },
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Cookie",
+                                "value": "M2QwNDlmOGQtY2JjOS00ZTdiLTg4MGYtNWE1OTBiMTI2NjMz",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "username",
+                                    "value": "{{username}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "{{password}}",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "https://access-uat-api.corelogic.asia/access/login",
+                            "host": [
+                                "https://access-uat-api.corelogic.asia"
+                            ],
+                            "path": [
+                                "access",
+                                "login"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2.a. Get Code - session exists - save code",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "",
+                                    "// Follow redirects off - ?code=aaaa should be in the redirect header",
+                                    "const location = pm.response.headers.get('location');",
+                                    "let authCode = '';",
+                                    "console.log(\"Location ? \", location);",
+                                    "if (location && location.indexOf('code=') > -1) {",
+                                    "    let params = location.split('?')",
+                                    "    const querystring = require('querystring');",
+                                    "    const codeParam = querystring.parse(params[1]);",
+                                    "    console.log(\"Location Code? \", codeParam);",
+                                    "    authCode = codeParam.code;",
+                                    "    pm.globals.set(\"code\", authCode);",
+                                    "}",
+                                    "pm.test(\"Login produces authorization code\", function () {",
+                                    "    pm.expect(authCode).to.be.a('string').and.not.be.empty;",
+                                    "});",
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "protocolProfileBehavior": {
+                        "disableCookies": false,
+                        "followRedirects": false,
+                        "followOriginalHttpMethod": false
+                    },
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://access-uat-api.corelogic.asia/access/oauth/authorize?response_type=code&client_id={{client-id}}&redirect_uri={{client-redirect-uri}}&scope=openid",
+                            "host": [
+                                "https://access-uat-api.corelogic.asia"
+                            ],
+                            "path": [
+                                "access",
+                                "oauth",
+                                "authorize"
+                            ],
+                            "query": [
+                                {
+                                    "key": "response_type",
+                                    "value": "code"
+                                },
+                                {
+                                    "key": "client_id",
+                                    "value": "{{client-id}}",
+                                    "description": "See collection variables"
+                                },
+                                {
+                                    "key": "redirect_uri",
+                                    "value": "{{client-redirect-uri}}"
+                                },
+                                {
+                                    "key": "scope",
+                                    "value": "openid"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Convert code to token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var data = JSON.parse(responseBody);",
+                                    "",
+                                    "// Short-lived tokens access tokens",
+                                    "if (data.access_token) {",
+                                    "    pm.globals.set(\"userToken\", data.access_token);",
+                                    "    pm.globals.set(\"idToken\", data.id_token);",
+                                    "}",
+                                    "// Use this to refresh above tokens",
+                                    "if (data.refresh_token) {",
+                                    "    pm.globals.set(\"refreshToken\", data.refresh_token);",
+                                    "}",
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "protocolProfileBehavior": {
+                        "followRedirects": true,
+                        "disableCookies": false
+                    },
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://access-uat-api.corelogic.asia/access/oauth/token?grant_type=authorization_code&code=xJT7elKX49xfZXCdEOwX2vgmgGD_2ly34cBYRKEQ&redirect_uri={{client-redirect-uri}}&client_id={{client-id}}&client_secret={{client-secret}}",
+                            "host": [
+                                "https://access-uat-api.corelogic.asia"
+                            ],
+                            "path": [
+                                "access",
+                                "oauth",
+                                "token"
+                            ],
+                            "query": [
+                                {
+                                    "key": "grant_type",
+                                    "value": "authorization_code"
+                                },
+                                {
+                                    "key": "code",
+                                    "value": "xJT7elKX49xfZXCdEOwX2vgmgGD_2ly34cBYRKEQ",
+                                    "description": "Set in request 2. tests"
+                                },
+                                {
+                                    "key": "redirect_uri",
+                                    "value": "{{client-redirect-uri}}",
+                                    "description": "Collection variables"
+                                },
+                                {
+                                    "key": "client_id",
+                                    "value": "{{client-id}}"
+                                },
+                                {
+                                    "key": "client_secret",
+                                    "value": "{{client-secret}}"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Convert Refresh Token - repeatable",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var data = JSON.parse(responseBody);\r",
+                                    "if (data.access_token) {\r",
+                                    "    pm.globals.set(\"userToken\", data.access_token);\r",
+                                    "    pm.globals.set(\"idToken\", data.id_token);\r",
+                                    "}\r",
+                                    "\r",
+                                    "// save the new refresh token for the next time\r",
+                                    "if (data.refresh_token) {\r",
+                                    "  pm.globals.set(\"refreshToken\", data.refresh_token);\r",
+                                    "}\r",
+                                    "\r",
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://access-uat-api.corelogic.asia/access/oauth/token?grant_type=refresh_token&refresh_token=ee3458e7-33ee-42bc-948b-03ebc9b9f167&client_id={{client-id}}&client_secret={{client-secret}}",
+                            "host": [
+                                "https://access-uat-api.corelogic.asia"
+                            ],
+                            "path": [
+                                "access",
+                                "oauth",
+                                "token"
+                            ],
+                            "query": [
+                                {
+                                    "key": "grant_type",
+                                    "value": "refresh_token"
+                                },
+                                {
+                                    "key": "refresh_token",
+                                    "value": "ee3458e7-33ee-42bc-948b-03ebc9b9f167",
+                                    "description": "Set in Request 3. tests."
+                                },
+                                {
+                                    "key": "client_id",
+                                    "value": "{{client-id}}"
+                                },
+                                {
+                                    "key": "client_secret",
+                                    "value": "{{client-secret}}"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify Token - UserInfo",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYTM5OTM5MS01MzZmLTQyMmYtOGQ4Ny0yMmFhNjY3MWZjNjciLCJhcHBfYWNjdF9ndWlkIjoiYjk4NjI2ZWQtMzc0Yi00MTcwLWIyOWYtNzkyNjAwYjg1OTE3IiwidXNlcl9uYW1lIjoiZnQtYWxpY2UiLCJyb2xlcyI6WyJNQVBfQURWQU5DRUQiLCJBdWN0aW9ucyIsIkRFRUQ3IiwiUlBQIERlc2t0b3AiLCJUaXRsZXMiXSwiaXNzIjoiaHR0cHM6Ly9hcGktZGV2LmNvcmVsb2dpYy5hc2lhL2FjY2VzcyIsImVudl9hY2Nlc3NfcmVzdHJpY3QiOnRydWUsImVudiI6ImRldiIsImF1dGhvcml0aWVzIjpbIkFQUF9BQ0NUX0FETUlOIiwiVU1fQURNSU4iLCJDTEFVRF9VSSJdLCJnZW9fY29kZXMiOlsiUUxEIC0gUmVnaW9uYWwiLCJRTEQgLSBNZXRybyJdLCJjbGllbnRfaWQiOiIyYzViYjdlNSIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE3MTQyNzU3MTQsImFjY3RfZ3VpZCI6ImM4OTI0NDhmLWExYWMtNGZhOC05ZjE1LWI4NGY3NzY0ZjIyMiIsInVzcl9ndWlkIjoiN2Q3MzExYjYtMjI2MC00OWI4LTk0ZjctMjMwYzJmMTRhMDNiIn0.k8f0qvtzg0LT_zYWh6MIX78ogn1oL6IS0RRlwNDtbc-Am1cEfgygR0earT723sS37WhreXkt2re-90052izaAdNobYaU8Cwr_WozzZvaBuY2w0nQDwijTcpw1p3xnV07pL3_OEKrMO0Qc_BOBo_WoDjCzWBoXghOcuvaJAFKm-o",
+                                "type": "text",
+                                "description": "Access ID User Token"
+                            }
+                        ],
+                        "url": {
+                            "raw": "https://access-uat-api.corelogic.asia/access/userinfo",
+                            "host": [
+                                "https://access-uat-api.corelogic.asia"
+                            ],
+                            "path": [
+                                "access",
+                                "userinfo"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. session logout",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "protocolProfileBehavior": {
+                        "followRedirects": true
+                    },
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://access-uat-api.corelogic.asia/access/logout?session-clear=true",
+                            "host": [
+                                "https://access-uat-api.corelogic.asia"
+                            ],
+                            "path": [
+                                "access",
+                                "logout"
+                            ],
+                            "query": [
+                                {
+                                    "key": "session-clear",
+                                    "value": "true"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5.a. Application logout (returns to login page)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "protocolProfileBehavior": {
+                        "followRedirects": true
+                    },
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://access-uat-api.corelogic.asia/access/user/logout?redirectUri={{rpp}}/rpp/login.html&accessToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYTM5OTM5MS01MzZmLTQyMmYtOGQ4Ny0yMmFhNjY3MWZjNjciLCJhcHBfYWNjdF9ndWlkIjoiYjk4NjI2ZWQtMzc0Yi00MTcwLWIyOWYtNzkyNjAwYjg1OTE3IiwidXNlcl9uYW1lIjoiZnQtYWxpY2UiLCJyb2xlcyI6WyJNQVBfQURWQU5DRUQiLCJBdWN0aW9ucyIsIkRFRUQ3IiwiUlBQIERlc2t0b3AiLCJUaXRsZXMiXSwiaXNzIjoiaHR0cHM6Ly9hcGktZGV2LmNvcmVsb2dpYy5hc2lhL2FjY2VzcyIsImVudl9hY2Nlc3NfcmVzdHJpY3QiOnRydWUsImVudiI6ImRldiIsImF1dGhvcml0aWVzIjpbIkFQUF9BQ0NUX0FETUlOIiwiVU1fQURNSU4iLCJDTEFVRF9VSSJdLCJnZW9fY29kZXMiOlsiUUxEIC0gUmVnaW9uYWwiLCJRTEQgLSBNZXRybyJdLCJjbGllbnRfaWQiOiIyYzViYjdlNSIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE3MTQyNzU3MTQsImFjY3RfZ3VpZCI6ImM4OTI0NDhmLWExYWMtNGZhOC05ZjE1LWI4NGY3NzY0ZjIyMiIsInVzcl9ndWlkIjoiN2Q3MzExYjYtMjI2MC00OWI4LTk0ZjctMjMwYzJmMTRhMDNiIn0.k8f0qvtzg0LT_zYWh6MIX78ogn1oL6IS0RRlwNDtbc-Am1cEfgygR0earT723sS37WhreXkt2re-90052izaAdNobYaU8Cwr_WozzZvaBuY2w0nQDwijTcpw1p3xnV07pL3_OEKrMO0Qc_BOBo_WoDjCzWBoXghOcuvaJAFKm-o",
+                            "host": [
+                                "https://access-uat-api.corelogic.asia"
+                            ],
+                            "path": [
+                                "access",
+                                "user",
+                                "logout"
+                            ],
+                            "query": [
+                                {
+                                    "key": "redirectUri",
+                                    "value": "{{rpp}}/rpp/login.html"
+                                },
+                                {
+                                    "key": "accessToken",
+                                    "value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYTM5OTM5MS01MzZmLTQyMmYtOGQ4Ny0yMmFhNjY3MWZjNjciLCJhcHBfYWNjdF9ndWlkIjoiYjk4NjI2ZWQtMzc0Yi00MTcwLWIyOWYtNzkyNjAwYjg1OTE3IiwidXNlcl9uYW1lIjoiZnQtYWxpY2UiLCJyb2xlcyI6WyJNQVBfQURWQU5DRUQiLCJBdWN0aW9ucyIsIkRFRUQ3IiwiUlBQIERlc2t0b3AiLCJUaXRsZXMiXSwiaXNzIjoiaHR0cHM6Ly9hcGktZGV2LmNvcmVsb2dpYy5hc2lhL2FjY2VzcyIsImVudl9hY2Nlc3NfcmVzdHJpY3QiOnRydWUsImVudiI6ImRldiIsImF1dGhvcml0aWVzIjpbIkFQUF9BQ0NUX0FETUlOIiwiVU1fQURNSU4iLCJDTEFVRF9VSSJdLCJnZW9fY29kZXMiOlsiUUxEIC0gUmVnaW9uYWwiLCJRTEQgLSBNZXRybyJdLCJjbGllbnRfaWQiOiIyYzViYjdlNSIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE3MTQyNzU3MTQsImFjY3RfZ3VpZCI6ImM4OTI0NDhmLWExYWMtNGZhOC05ZjE1LWI4NGY3NzY0ZjIyMiIsInVzcl9ndWlkIjoiN2Q3MzExYjYtMjI2MC00OWI4LTk0ZjctMjMwYzJmMTRhMDNiIn0.k8f0qvtzg0LT_zYWh6MIX78ogn1oL6IS0RRlwNDtbc-Am1cEfgygR0earT723sS37WhreXkt2re-90052izaAdNobYaU8Cwr_WozzZvaBuY2w0nQDwijTcpw1p3xnV07pL3_OEKrMO0Qc_BOBo_WoDjCzWBoXghOcuvaJAFKm-o"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Application Silent Login by token",
+            "item": [
+                {
+                    "name": "RP Data UAT Silent login Copy",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const moment = require('moment');\r",
+                                    "const timestamp = moment().format(\"yyyy-MM-DDTHH:mm:ssZ\");\r",
+                                    "const timestampEncoded = encodeURIComponent(timestamp);\r",
+                                    "\r",
+                                    "// pick up token from authorization code grant (result of Step 3. or refreshes Step 4.)\r",
+                                    "const token = pm.globals.get('userToken');\r",
+                                    "const apiKey = pm.collectionVariables.get(\"silent-api-key\");\r",
+                                    "const apiSecret = pm.collectionVariables.get(\"silent-api-secret\");\r",
+                                    "\r",
+                                    "// the querystring value we hash should not be URL encoded:\r",
+                                    "const hashQuerystring = `timestamp=${timestamp}&oauthToken=${token}&apiKey=${apiKey}`;\r",
+                                    "// the querystring value we use for the URL should be URL encoded:\r",
+                                    "const querystring = `timestamp=${timestampEncoded}&oauthToken=${token}&apiKey=${apiKey}`;\r",
+                                    "pm.globals.set(\"loginQuery\", querystring);\r",
+                                    "console.log(\"Login query:\", querystring);\r",
+                                    "\r",
+                                    "const secret = CryptoJS.enc.Utf8.parse(apiSecret);\r",
+                                    "const shaHash = CryptoJS.HmacSHA256(hashQuerystring, secret);\r",
+                                    "const hexHash = shaHash.toString(CryptoJS.enc.Hex);\r",
+                                    "pm.globals.set(\"loginHash\", hexHash);\r",
+                                    "console.log(\"Login hash:\", hexHash);\r",
+                                    "\r",
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "protocolProfileBehavior": {
+                        "followRedirects": true,
+                        "disableCookies": false
+                    },
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{rpp}}/rpp/dashboard.html?timestamp=2024-03-26T15%3A17%3A12%2B10%3A00&oauthToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjZTliNTI2Yi02ZjAwLTQxZjctOWUyNC1iYzY1YTM0NDRiYTciLCJhcHBfYWNjdF9ndWlkIjoiZTRmNTFiZmYtMDI0OS00Yzc3LThhNzUtMzBmZGRlODZkN2Q2IiwidXNlcl9uYW1lIjoic2hhcm9uLmJleW5vbiIsInJvbGVzIjpbIlJlbnRhbCBBdm0gRnVsbCIsIlByb2ZpbGVyIFByb3BlcnR5IDEgUGFnZSIsIkRFRUQ3IiwiUHJvcGVydHkgRGltZW5zaW9ucyIsIlJBRElVU19TRUFSQ0giLCJERVZFTE9QTUVOVF9BUFBMSUNBVElPTlMiLCJMaXN0IFJlbnQiLCJNYXJrZXQgQ29tcGFyZSIsIlJlcG9ydCBNYXJrZXQgQ29tcGFyZSIsIlNBVkVEX0xJU1RTIiwiQnJhbmRpbmcgUmVwb3J0cyIsIlNlYXJjaCBBZGRyZXNzIiwiQnV5ZXJzIFJlcG9ydCIsIlJQRGF0YSBTdGF0aXN0aWNzIiwiTEdBIFNlYXJjaCIsIlRJVExFU19SRVBPUlQiLCJQYW5lbCBBdWN0aW9ucyIsIlByZW1pdW0gQ01BIiwiU2VhcmNoIEFkdmFuY2VkIiwiU0FWRURfU0VBUkNIRVMiLCJBY2Nlc3MgRGVsZWdhdGlvbiIsIkRJR0lUQUxfUFJPUEVSVFlfUFJPRklMRSIsIlJlbnRhbHMgQ01BIiwiUkVOVEFMX1ZBTFVBVElPTlMiLCJTZWFyY2ggUGFyY2VsIiwiUHJvZmlsZXIgU3VidXJiIiwiTWFwIiwiU0VBUkNIX0JVSUxESU5HX05BTUUiLCJTZWFyY2ggTmFtZSIsIlJlcG9ydCBTYWxlcyIsIlJlcG9ydCBPVE0gRm9yIFNhbGUiLCJSZXBvcnQgQXVjdGlvbnMiLCJWYWx1YXRpb24iLCJTdWJ1cmIgU3RhdGlzdGljcyIsIlByb3BlcnR5IENNQSIsIlByb3BlcnR5IEZlYXR1cmVzIiwiQURWQU5DRURfRklMVEVSUyIsIlJlcG9ydCBQcm9wZXJ0eSBMaXN0IiwiT1RNIEZvciBTYWxlIiwiRVhQT1JUX0xJTUlUX1BSTyIsIk9UTSBGb3IgUmVudCIsIlByb3BlcnR5IFByb2ZpbGVyIiwiQ2hpbmVzZSBMYW5ndWFnZSBMaXRlIiwiUHJvc3BlY3RvciIsIkF1Y3Rpb25zIiwiRXhwb3J0IiwiU2FsZXMgSGlzdG9yeSIsIk5PVElGSUNBVElPTlMiLCJQcm9wZXJ0eSIsIkNyZWRpdCBDYXJkIFRva2VuaXNhdGlvbiIsIk1BUF9BRFZBTkNFRCIsIkNNQSBHZW5lcmljIFJlcG9ydCBFbmdpbmUgRnVsbCIsIkJBU0VfRklMVEVSUyIsIlJlcG9ydCBQcmV2aWV3IiwiUGhvbmUgUmVjb3JkcyIsIlByb3BlcnR5IE1vbml0b3IiLCJGb3JtcyBJbnRlZ3JhdGlvbiBETSIsIkJhc2UiLCJQcm9wZXJ0eSBDTUEgQ3VzdG9tIiwiUmVwb3J0IFN1YnVyYiIsIlRpdGxlcyIsIk1hcmtldGluZyBGdWxsIiwiRm9ybXMgSW50ZWdyYXRpb24gQURMIiwiQ29udGFjdHMiLCJSZXBvcnQgT1RNIEZvciBSZW50IiwiU0FWRURfVEVSUklUT1JZIiwiUFJPUE9TQUxfUE9JTlQiLCJWQUxVQVRJT05TX1JFUE9SVCIsIkxpc3QgU2FsZSIsIlVuZGlzY2xvc2VkIFNhbGVzIEFjY2VzcyJdLCJpc3MiOiJodHRwczovL2FjY2Vzcy11YXQtYXBpLmNvcmVsb2dpYy5hc2lhIiwiZW52X2FjY2Vzc19yZXN0cmljdCI6ZmFsc2UsImVudiI6InVhdCIsImF1dGhvcml0aWVzIjpbIkFQUF9BQ0NUX0FETUlOIiwiQ0xBVURfVUkiXSwiZ2VvX2NvZGVzIjpbIldBIC0gUmVnaW9uYWwiLCJXQSAtIE1ldHJvIiwiVEFTIC0gRnVsbCBTdGF0ZSIsIlNBIC0gUmVnaW9uYWwiLCJTQSAtIE1ldHJvIiwiUUxEIC0gUmVnaW9uYWwiLCJRTEQgLSBNZXRybyIsIk5UIC0gRnVsbCBTdGF0ZSIsIk5TVyAtIFJlZ2lvbmFsIiwiTlNXIC0gTWV0cm8iLCJBQ1QgLSBGdWxsIFN0YXRlIiwiVklDIC0gRnVsbCBTdGF0ZSJdLCJjbGllbnRfaWQiOiJjMGJiYTc2ZSIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE3MTE0MzM3OTQsImFjY3RfZ3VpZCI6IjVkMTYzYTIwLWQyNDYtNDg3My1iZTI1LTQ5NTEzMjkzM2U5ZiIsInVzcl9ndWlkIjoiMTFlZDg1ZTEtNDAyMy00ZWM3LTg2YWItYTc3ZDhlYzMyNWVlIn0.VOf4C0ZImV75AY2TVsKdwav82uqoeO2hklUPRbtFCcQSXLMedxo0fbYuo1Tim8UToEQnPXBrmwb1MrZhWqI5_LNJY7CHGdX5NQ6Z_dIFavg-sNQ7bfN54O6bImW1Au0MUra-nWaB5XG1JHJkpjqTCRqgilyxPCsWPoh086KUVLs&apiKey=9d4f3a80c68dae039b176e0df654f3fb8a64fe68&hash=f4eaa3ea115aa02a09f42ba817c7a5b1ced9fbfc3b692560fda49f8245c7ff73",
+                            "host": [
+                                "{{rpp}}"
+                            ],
+                            "path": [
+                                "rpp",
+                                "dashboard.html"
+                            ],
+                            "query": [
+                                {
+                                    "key": "timestamp=2024-03-26T15%3A17%3A12%2B10%3A00&oauthToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjZTliNTI2Yi02ZjAwLTQxZjctOWUyNC1iYzY1YTM0NDRiYTciLCJhcHBfYWNjdF9ndWlkIjoiZTRmNTFiZmYtMDI0OS00Yzc3LThhNzUtMzBmZGRlODZkN2Q2IiwidXNlcl9uYW1lIjoic2hhcm9uLmJleW5vbiIsInJvbGVzIjpbIlJlbnRhbCBBdm0gRnVsbCIsIlByb2ZpbGVyIFByb3BlcnR5IDEgUGFnZSIsIkRFRUQ3IiwiUHJvcGVydHkgRGltZW5zaW9ucyIsIlJBRElVU19TRUFSQ0giLCJERVZFTE9QTUVOVF9BUFBMSUNBVElPTlMiLCJMaXN0IFJlbnQiLCJNYXJrZXQgQ29tcGFyZSIsIlJlcG9ydCBNYXJrZXQgQ29tcGFyZSIsIlNBVkVEX0xJU1RTIiwiQnJhbmRpbmcgUmVwb3J0cyIsIlNlYXJjaCBBZGRyZXNzIiwiQnV5ZXJzIFJlcG9ydCIsIlJQRGF0YSBTdGF0aXN0aWNzIiwiTEdBIFNlYXJjaCIsIlRJVExFU19SRVBPUlQiLCJQYW5lbCBBdWN0aW9ucyIsIlByZW1pdW0gQ01BIiwiU2VhcmNoIEFkdmFuY2VkIiwiU0FWRURfU0VBUkNIRVMiLCJBY2Nlc3MgRGVsZWdhdGlvbiIsIkRJR0lUQUxfUFJPUEVSVFlfUFJPRklMRSIsIlJlbnRhbHMgQ01BIiwiUkVOVEFMX1ZBTFVBVElPTlMiLCJTZWFyY2ggUGFyY2VsIiwiUHJvZmlsZXIgU3VidXJiIiwiTWFwIiwiU0VBUkNIX0JVSUxESU5HX05BTUUiLCJTZWFyY2ggTmFtZSIsIlJlcG9ydCBTYWxlcyIsIlJlcG9ydCBPVE0gRm9yIFNhbGUiLCJSZXBvcnQgQXVjdGlvbnMiLCJWYWx1YXRpb24iLCJTdWJ1cmIgU3RhdGlzdGljcyIsIlByb3BlcnR5IENNQSIsIlByb3BlcnR5IEZlYXR1cmVzIiwiQURWQU5DRURfRklMVEVSUyIsIlJlcG9ydCBQcm9wZXJ0eSBMaXN0IiwiT1RNIEZvciBTYWxlIiwiRVhQT1JUX0xJTUlUX1BSTyIsIk9UTSBGb3IgUmVudCIsIlByb3BlcnR5IFByb2ZpbGVyIiwiQ2hpbmVzZSBMYW5ndWFnZSBMaXRlIiwiUHJvc3BlY3RvciIsIkF1Y3Rpb25zIiwiRXhwb3J0IiwiU2FsZXMgSGlzdG9yeSIsIk5PVElGSUNBVElPTlMiLCJQcm9wZXJ0eSIsIkNyZWRpdCBDYXJkIFRva2VuaXNhdGlvbiIsIk1BUF9BRFZBTkNFRCIsIkNNQSBHZW5lcmljIFJlcG9ydCBFbmdpbmUgRnVsbCIsIkJBU0VfRklMVEVSUyIsIlJlcG9ydCBQcmV2aWV3IiwiUGhvbmUgUmVjb3JkcyIsIlByb3BlcnR5IE1vbml0b3IiLCJGb3JtcyBJbnRlZ3JhdGlvbiBETSIsIkJhc2UiLCJQcm9wZXJ0eSBDTUEgQ3VzdG9tIiwiUmVwb3J0IFN1YnVyYiIsIlRpdGxlcyIsIk1hcmtldGluZyBGdWxsIiwiRm9ybXMgSW50ZWdyYXRpb24gQURMIiwiQ29udGFjdHMiLCJSZXBvcnQgT1RNIEZvciBSZW50IiwiU0FWRURfVEVSUklUT1JZIiwiUFJPUE9TQUxfUE9JTlQiLCJWQUxVQVRJT05TX1JFUE9SVCIsIkxpc3QgU2FsZSIsIlVuZGlzY2xvc2VkIFNhbGVzIEFjY2VzcyJdLCJpc3MiOiJodHRwczovL2FjY2Vzcy11YXQtYXBpLmNvcmVsb2dpYy5hc2lhIiwiZW52X2FjY2Vzc19yZXN0cmljdCI6ZmFsc2UsImVudiI6InVhdCIsImF1dGhvcml0aWVzIjpbIkFQUF9BQ0NUX0FETUlOIiwiQ0xBVURfVUkiXSwiZ2VvX2NvZGVzIjpbIldBIC0gUmVnaW9uYWwiLCJXQSAtIE1ldHJvIiwiVEFTIC0gRnVsbCBTdGF0ZSIsIlNBIC0gUmVnaW9uYWwiLCJTQSAtIE1ldHJvIiwiUUxEIC0gUmVnaW9uYWwiLCJRTEQgLSBNZXRybyIsIk5UIC0gRnVsbCBTdGF0ZSIsIk5TVyAtIFJlZ2lvbmFsIiwiTlNXIC0gTWV0cm8iLCJBQ1QgLSBGdWxsIFN0YXRlIiwiVklDIC0gRnVsbCBTdGF0ZSJdLCJjbGllbnRfaWQiOiJjMGJiYTc2ZSIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE3MTE0MzM3OTQsImFjY3RfZ3VpZCI6IjVkMTYzYTIwLWQyNDYtNDg3My1iZTI1LTQ5NTEzMjkzM2U5ZiIsInVzcl9ndWlkIjoiMTFlZDg1ZTEtNDAyMy00ZWM3LTg2YWItYTc3ZDhlYzMyNWVlIn0.VOf4C0ZImV75AY2TVsKdwav82uqoeO2hklUPRbtFCcQSXLMedxo0fbYuo1Tim8UToEQnPXBrmwb1MrZhWqI5_LNJY7CHGdX5NQ6Z_dIFavg-sNQ7bfN54O6bImW1Au0MUra-nWaB5XG1JHJkpjqTCRqgilyxPCsWPoh086KUVLs&apiKey=9d4f3a80c68dae039b176e0df654f3fb8a64fe68",
+                                    "value": null,
+                                    "description": "Calculated in Pre-request Script - requires \"userToken\" is set!"
+                                },
+                                {
+                                    "key": "hash",
+                                    "value": "f4eaa3ea115aa02a09f42ba817c7a5b1ced9fbfc3b692560fda49f8245c7ff73",
+                                    "description": "Caluclated in Pre-request Script"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Property Guru UAT Silent login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "const moment = require('moment');\r",
+                                    "const timestamp = moment().format(\"yyyy-MM-DDTHH:mm:ssZ\");\r",
+                                    "const timestampEncoded = encodeURIComponent(timestamp);\r",
+                                    "\r",
+                                    "// pick up token from authorization code grant (result of Step 3. or refreshes Step 4.)\r",
+                                    "const token = pm.globals.get('userToken');\r",
+                                    "const apiKey = pm.collectionVariables.get(\"silent-api-key\");\r",
+                                    "const apiSecret = pm.collectionVariables.get(\"silent-api-secret\");\r",
+                                    "\r",
+                                    "const hashQuerystring = `timestamp=${timestamp}&oauthToken=${token}&apiKey=${apiKey}`;\r",
+                                    "const querystring = `timestamp=${timestampEncoded}&oauthToken=${token}&apiKey=${apiKey}`;\r",
+                                    "pm.globals.set(\"loginQuery\", querystring);\r",
+                                    "console.log(\"Login query:\", querystring);\r",
+                                    "\r",
+                                    "const secret = CryptoJS.enc.Utf8.parse(apiSecret);\r",
+                                    "const shaHash = CryptoJS.HmacSHA256(hashQuerystring, secret);\r",
+                                    "const hexHash = shaHash.toString(CryptoJS.enc.Hex);\r",
+                                    "pm.globals.set(\"loginHash\", hexHash);\r",
+                                    "console.log(\"Login hash:\", hexHash);\r",
+                                    "\r",
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "protocolProfileBehavior": {
+                        "followRedirects": true,
+                        "disableCookies": false
+                    },
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{rpnz}}/rpnz/dashboard.html?timestamp=2024-03-26T15%3A17%3A12%2B10%3A00&oauthToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjZTliNTI2Yi02ZjAwLTQxZjctOWUyNC1iYzY1YTM0NDRiYTciLCJhcHBfYWNjdF9ndWlkIjoiZTRmNTFiZmYtMDI0OS00Yzc3LThhNzUtMzBmZGRlODZkN2Q2IiwidXNlcl9uYW1lIjoic2hhcm9uLmJleW5vbiIsInJvbGVzIjpbIlJlbnRhbCBBdm0gRnVsbCIsIlByb2ZpbGVyIFByb3BlcnR5IDEgUGFnZSIsIkRFRUQ3IiwiUHJvcGVydHkgRGltZW5zaW9ucyIsIlJBRElVU19TRUFSQ0giLCJERVZFTE9QTUVOVF9BUFBMSUNBVElPTlMiLCJMaXN0IFJlbnQiLCJNYXJrZXQgQ29tcGFyZSIsIlJlcG9ydCBNYXJrZXQgQ29tcGFyZSIsIlNBVkVEX0xJU1RTIiwiQnJhbmRpbmcgUmVwb3J0cyIsIlNlYXJjaCBBZGRyZXNzIiwiQnV5ZXJzIFJlcG9ydCIsIlJQRGF0YSBTdGF0aXN0aWNzIiwiTEdBIFNlYXJjaCIsIlRJVExFU19SRVBPUlQiLCJQYW5lbCBBdWN0aW9ucyIsIlByZW1pdW0gQ01BIiwiU2VhcmNoIEFkdmFuY2VkIiwiU0FWRURfU0VBUkNIRVMiLCJBY2Nlc3MgRGVsZWdhdGlvbiIsIkRJR0lUQUxfUFJPUEVSVFlfUFJPRklMRSIsIlJlbnRhbHMgQ01BIiwiUkVOVEFMX1ZBTFVBVElPTlMiLCJTZWFyY2ggUGFyY2VsIiwiUHJvZmlsZXIgU3VidXJiIiwiTWFwIiwiU0VBUkNIX0JVSUxESU5HX05BTUUiLCJTZWFyY2ggTmFtZSIsIlJlcG9ydCBTYWxlcyIsIlJlcG9ydCBPVE0gRm9yIFNhbGUiLCJSZXBvcnQgQXVjdGlvbnMiLCJWYWx1YXRpb24iLCJTdWJ1cmIgU3RhdGlzdGljcyIsIlByb3BlcnR5IENNQSIsIlByb3BlcnR5IEZlYXR1cmVzIiwiQURWQU5DRURfRklMVEVSUyIsIlJlcG9ydCBQcm9wZXJ0eSBMaXN0IiwiT1RNIEZvciBTYWxlIiwiRVhQT1JUX0xJTUlUX1BSTyIsIk9UTSBGb3IgUmVudCIsIlByb3BlcnR5IFByb2ZpbGVyIiwiQ2hpbmVzZSBMYW5ndWFnZSBMaXRlIiwiUHJvc3BlY3RvciIsIkF1Y3Rpb25zIiwiRXhwb3J0IiwiU2FsZXMgSGlzdG9yeSIsIk5PVElGSUNBVElPTlMiLCJQcm9wZXJ0eSIsIkNyZWRpdCBDYXJkIFRva2VuaXNhdGlvbiIsIk1BUF9BRFZBTkNFRCIsIkNNQSBHZW5lcmljIFJlcG9ydCBFbmdpbmUgRnVsbCIsIkJBU0VfRklMVEVSUyIsIlJlcG9ydCBQcmV2aWV3IiwiUGhvbmUgUmVjb3JkcyIsIlByb3BlcnR5IE1vbml0b3IiLCJGb3JtcyBJbnRlZ3JhdGlvbiBETSIsIkJhc2UiLCJQcm9wZXJ0eSBDTUEgQ3VzdG9tIiwiUmVwb3J0IFN1YnVyYiIsIlRpdGxlcyIsIk1hcmtldGluZyBGdWxsIiwiRm9ybXMgSW50ZWdyYXRpb24gQURMIiwiQ29udGFjdHMiLCJSZXBvcnQgT1RNIEZvciBSZW50IiwiU0FWRURfVEVSUklUT1JZIiwiUFJPUE9TQUxfUE9JTlQiLCJWQUxVQVRJT05TX1JFUE9SVCIsIkxpc3QgU2FsZSIsIlVuZGlzY2xvc2VkIFNhbGVzIEFjY2VzcyJdLCJpc3MiOiJodHRwczovL2FjY2Vzcy11YXQtYXBpLmNvcmVsb2dpYy5hc2lhIiwiZW52X2FjY2Vzc19yZXN0cmljdCI6ZmFsc2UsImVudiI6InVhdCIsImF1dGhvcml0aWVzIjpbIkFQUF9BQ0NUX0FETUlOIiwiQ0xBVURfVUkiXSwiZ2VvX2NvZGVzIjpbIldBIC0gUmVnaW9uYWwiLCJXQSAtIE1ldHJvIiwiVEFTIC0gRnVsbCBTdGF0ZSIsIlNBIC0gUmVnaW9uYWwiLCJTQSAtIE1ldHJvIiwiUUxEIC0gUmVnaW9uYWwiLCJRTEQgLSBNZXRybyIsIk5UIC0gRnVsbCBTdGF0ZSIsIk5TVyAtIFJlZ2lvbmFsIiwiTlNXIC0gTWV0cm8iLCJBQ1QgLSBGdWxsIFN0YXRlIiwiVklDIC0gRnVsbCBTdGF0ZSJdLCJjbGllbnRfaWQiOiJjMGJiYTc2ZSIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE3MTE0MzM3OTQsImFjY3RfZ3VpZCI6IjVkMTYzYTIwLWQyNDYtNDg3My1iZTI1LTQ5NTEzMjkzM2U5ZiIsInVzcl9ndWlkIjoiMTFlZDg1ZTEtNDAyMy00ZWM3LTg2YWItYTc3ZDhlYzMyNWVlIn0.VOf4C0ZImV75AY2TVsKdwav82uqoeO2hklUPRbtFCcQSXLMedxo0fbYuo1Tim8UToEQnPXBrmwb1MrZhWqI5_LNJY7CHGdX5NQ6Z_dIFavg-sNQ7bfN54O6bImW1Au0MUra-nWaB5XG1JHJkpjqTCRqgilyxPCsWPoh086KUVLs&apiKey=9d4f3a80c68dae039b176e0df654f3fb8a64fe68&hash=f4eaa3ea115aa02a09f42ba817c7a5b1ced9fbfc3b692560fda49f8245c7ff73",
+                            "host": [
+                                "{{rpnz}}"
+                            ],
+                            "path": [
+                                "rpnz",
+                                "dashboard.html"
+                            ],
+                            "query": [
+                                {
+                                    "key": "timestamp=2024-03-26T15%3A17%3A12%2B10%3A00&oauthToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjZTliNTI2Yi02ZjAwLTQxZjctOWUyNC1iYzY1YTM0NDRiYTciLCJhcHBfYWNjdF9ndWlkIjoiZTRmNTFiZmYtMDI0OS00Yzc3LThhNzUtMzBmZGRlODZkN2Q2IiwidXNlcl9uYW1lIjoic2hhcm9uLmJleW5vbiIsInJvbGVzIjpbIlJlbnRhbCBBdm0gRnVsbCIsIlByb2ZpbGVyIFByb3BlcnR5IDEgUGFnZSIsIkRFRUQ3IiwiUHJvcGVydHkgRGltZW5zaW9ucyIsIlJBRElVU19TRUFSQ0giLCJERVZFTE9QTUVOVF9BUFBMSUNBVElPTlMiLCJMaXN0IFJlbnQiLCJNYXJrZXQgQ29tcGFyZSIsIlJlcG9ydCBNYXJrZXQgQ29tcGFyZSIsIlNBVkVEX0xJU1RTIiwiQnJhbmRpbmcgUmVwb3J0cyIsIlNlYXJjaCBBZGRyZXNzIiwiQnV5ZXJzIFJlcG9ydCIsIlJQRGF0YSBTdGF0aXN0aWNzIiwiTEdBIFNlYXJjaCIsIlRJVExFU19SRVBPUlQiLCJQYW5lbCBBdWN0aW9ucyIsIlByZW1pdW0gQ01BIiwiU2VhcmNoIEFkdmFuY2VkIiwiU0FWRURfU0VBUkNIRVMiLCJBY2Nlc3MgRGVsZWdhdGlvbiIsIkRJR0lUQUxfUFJPUEVSVFlfUFJPRklMRSIsIlJlbnRhbHMgQ01BIiwiUkVOVEFMX1ZBTFVBVElPTlMiLCJTZWFyY2ggUGFyY2VsIiwiUHJvZmlsZXIgU3VidXJiIiwiTWFwIiwiU0VBUkNIX0JVSUxESU5HX05BTUUiLCJTZWFyY2ggTmFtZSIsIlJlcG9ydCBTYWxlcyIsIlJlcG9ydCBPVE0gRm9yIFNhbGUiLCJSZXBvcnQgQXVjdGlvbnMiLCJWYWx1YXRpb24iLCJTdWJ1cmIgU3RhdGlzdGljcyIsIlByb3BlcnR5IENNQSIsIlByb3BlcnR5IEZlYXR1cmVzIiwiQURWQU5DRURfRklMVEVSUyIsIlJlcG9ydCBQcm9wZXJ0eSBMaXN0IiwiT1RNIEZvciBTYWxlIiwiRVhQT1JUX0xJTUlUX1BSTyIsIk9UTSBGb3IgUmVudCIsIlByb3BlcnR5IFByb2ZpbGVyIiwiQ2hpbmVzZSBMYW5ndWFnZSBMaXRlIiwiUHJvc3BlY3RvciIsIkF1Y3Rpb25zIiwiRXhwb3J0IiwiU2FsZXMgSGlzdG9yeSIsIk5PVElGSUNBVElPTlMiLCJQcm9wZXJ0eSIsIkNyZWRpdCBDYXJkIFRva2VuaXNhdGlvbiIsIk1BUF9BRFZBTkNFRCIsIkNNQSBHZW5lcmljIFJlcG9ydCBFbmdpbmUgRnVsbCIsIkJBU0VfRklMVEVSUyIsIlJlcG9ydCBQcmV2aWV3IiwiUGhvbmUgUmVjb3JkcyIsIlByb3BlcnR5IE1vbml0b3IiLCJGb3JtcyBJbnRlZ3JhdGlvbiBETSIsIkJhc2UiLCJQcm9wZXJ0eSBDTUEgQ3VzdG9tIiwiUmVwb3J0IFN1YnVyYiIsIlRpdGxlcyIsIk1hcmtldGluZyBGdWxsIiwiRm9ybXMgSW50ZWdyYXRpb24gQURMIiwiQ29udGFjdHMiLCJSZXBvcnQgT1RNIEZvciBSZW50IiwiU0FWRURfVEVSUklUT1JZIiwiUFJPUE9TQUxfUE9JTlQiLCJWQUxVQVRJT05TX1JFUE9SVCIsIkxpc3QgU2FsZSIsIlVuZGlzY2xvc2VkIFNhbGVzIEFjY2VzcyJdLCJpc3MiOiJodHRwczovL2FjY2Vzcy11YXQtYXBpLmNvcmVsb2dpYy5hc2lhIiwiZW52X2FjY2Vzc19yZXN0cmljdCI6ZmFsc2UsImVudiI6InVhdCIsImF1dGhvcml0aWVzIjpbIkFQUF9BQ0NUX0FETUlOIiwiQ0xBVURfVUkiXSwiZ2VvX2NvZGVzIjpbIldBIC0gUmVnaW9uYWwiLCJXQSAtIE1ldHJvIiwiVEFTIC0gRnVsbCBTdGF0ZSIsIlNBIC0gUmVnaW9uYWwiLCJTQSAtIE1ldHJvIiwiUUxEIC0gUmVnaW9uYWwiLCJRTEQgLSBNZXRybyIsIk5UIC0gRnVsbCBTdGF0ZSIsIk5TVyAtIFJlZ2lvbmFsIiwiTlNXIC0gTWV0cm8iLCJBQ1QgLSBGdWxsIFN0YXRlIiwiVklDIC0gRnVsbCBTdGF0ZSJdLCJjbGllbnRfaWQiOiJjMGJiYTc2ZSIsInNjb3BlIjpbIm9wZW5pZCJdLCJleHAiOjE3MTE0MzM3OTQsImFjY3RfZ3VpZCI6IjVkMTYzYTIwLWQyNDYtNDg3My1iZTI1LTQ5NTEzMjkzM2U5ZiIsInVzcl9ndWlkIjoiMTFlZDg1ZTEtNDAyMy00ZWM3LTg2YWItYTc3ZDhlYzMyNWVlIn0.VOf4C0ZImV75AY2TVsKdwav82uqoeO2hklUPRbtFCcQSXLMedxo0fbYuo1Tim8UToEQnPXBrmwb1MrZhWqI5_LNJY7CHGdX5NQ6Z_dIFavg-sNQ7bfN54O6bImW1Au0MUra-nWaB5XG1JHJkpjqTCRqgilyxPCsWPoh086KUVLs&apiKey=9d4f3a80c68dae039b176e0df654f3fb8a64fe68",
+                                    "value": null
+                                },
+                                {
+                                    "key": "hash",
+                                    "value": "f4eaa3ea115aa02a09f42ba817c7a5b1ced9fbfc3b692560fda49f8245c7ff73"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "GET: API Client_Credentials Simple - confirm client ID and secret are correct",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var data = JSON.parse(responseBody);",
+                            "// Simple access token - authenticates for API calls only",
+                            "if (data.access_token) {",
+                            "    pm.globals.set(\"tokenACCESS\",  data.access_token);",
+                            "}",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "https://access-uat-api.corelogic.asia/access/oauth/token?grant_type=client_credentials&client_id={{client-id}}&client_secret={{client-secret}}",
+                    "host": [
+                        "https://access-uat-api.corelogic.asia"
+                    ],
+                    "path": [
+                        "access",
+                        "oauth",
+                        "token"
+                    ],
+                    "query": [
+                        {
+                            "key": "grant_type",
+                            "value": "client_credentials"
+                        },
+                        {
+                            "key": "client_id",
+                            "value": "{{client-id}}"
+                        },
+                        {
+                            "key": "client_secret",
+                            "value": "{{client-secret}}"
+                        }
+                    ]
+                }
+            },
+            "response": [
+                {
+                    "name": "Access token - 12 hours",
+                    "originalRequest": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://access-control.api-coreservices-uat.aws.corelogic.io/access/oauth/token?grant_type=client_credentials&client_id={{client-id}}&client_secret={{client-secret}}",
+                            "host": [
+                                "https://access-control.api-coreservices-uat.aws.corelogic.io"
+                            ],
+                            "path": [
+                                "access",
+                                "oauth",
+                                "token"
+                            ],
+                            "query": [
+                                {
+                                    "key": "grant_type",
+                                    "value": "client_credentials"
+                                },
+                                {
+                                    "key": "client_id",
+                                    "value": "{{client-id}}"
+                                },
+                                {
+                                    "key": "client_secret",
+                                    "value": "{{client-secret}}"
+                                }
+                            ]
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Date",
+                            "value": "Sun, 19 Jun 2022 01:31:08 GMT"
+                        },
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "key": "Transfer-Encoding",
+                            "value": "chunked"
+                        },
+                        {
+                            "key": "Connection",
+                            "value": "keep-alive"
+                        },
+                        {
+                            "key": "Set-Cookie",
+                            "value": "AWSALB=dkmrJZnxPuW5Q8Shm9YCBWkulxjIWALwBiItXERhCAfdqORyBIwOnHqe+Cg3fp5akUgvN5mvXzQ/qQOTC062vUPfUum+hMHhyy7ukyRrCoD2d8ke2c44DccEgCHz; Expires=Sun, 26 Jun 2022 01:31:02 GMT; Path=/"
+                        },
+                        {
+                            "key": "Set-Cookie",
+                            "value": "AWSALBCORS=dkmrJZnxPuW5Q8Shm9YCBWkulxjIWALwBiItXERhCAfdqORyBIwOnHqe+Cg3fp5akUgvN5mvXzQ/qQOTC062vUPfUum+hMHhyy7ukyRrCoD2d8ke2c44DccEgCHz; Expires=Sun, 26 Jun 2022 01:31:02 GMT; Path=/; SameSite=None"
+                        },
+                        {
+                            "key": "Cache-Control",
+                            "value": "no-store"
+                        },
+                        {
+                            "key": "Pragma",
+                            "value": "no-cache"
+                        },
+                        {
+                            "key": "X-Content-Type-Options",
+                            "value": "nosniff"
+                        },
+                        {
+                            "key": "X-XSS-Protection",
+                            "value": "1; mode=block"
+                        },
+                        {
+                            "key": "X-Frame-Options",
+                            "value": "DENY"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n    \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJDUlQiLCJNQVAiLCJQVFkiLCJTR1QiLCJTVFMiLCJUVEwiXSwicm9sZXMiOltdLCJpc3MiOiJodHRwczovL2FjY2Vzcy1hcGkuY29yZWxvZ2ljLmFzaWEiLCJlbnZfYWNjZXNzX3Jlc3RyaWN0Ijp0cnVlLCJleHAiOjE2NTU2NDU0NjIsImdlb19jb2RlcyI6W10sImNsaWVudF9pZCI6IjJjNWJiN2U1Iiwic291cmNlX2V4Y2x1c2lvbiI6W119.QXN7OEAndudOiA9EmNvsF79_vBDYrlnnD7X6ADgb56_e3lpuva5S6ekkghxAcRsDiRpZKVj6sb0063Y6RDEosBrFod5cNsFyowId0nhuzVlSNjqdigyD9oSf1N_1G5lXWV20L8G98yHvflLssiZzkTMmiIbkjpYomF1MTWYgEH0\",\n    \"token_type\": \"bearer\",\n    \"expires_in\": 43193,\n    \"scope\": \"CRT MAP PTY SGT STS TTL\",\n    \"iss\": \"https://access-api.corelogic.asia\",\n    \"env_access_restrict\": true,\n    \"geo_codes\": [],\n    \"roles\": [],\n    \"source_exclusion\": []\n}"
+                }
+            ]
+        },
+        {
+            "name": "POST: API Client_Credentials - POST protects the secrets from URL exposure",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var data = JSON.parse(responseBody);",
+                            "// Simple access token - authenticates for API calls only",
+                            "if (data.access_token) {",
+                            "    pm.globals.set(\"tokenACCESS\",  data.access_token);",
+                            "}",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "urlencoded",
+                    "urlencoded": [
+                        {
+                            "key": "grant_type",
+                            "value": "client_credentials",
+                            "type": "text"
+                        },
+                        {
+                            "key": "client_id",
+                            "value": "{{client-id}}",
+                            "type": "text"
+                        },
+                        {
+                            "key": "client_secret",
+                            "value": "{{client-secret}}",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "https://access-uat-api.corelogic.asia/access/oauth/token",
+                    "host": [
+                        "https://access-uat-api.corelogic.asia"
+                    ],
+                    "path": [
+                        "access",
+                        "oauth",
+                        "token"
+                    ]
+                }
+            },
+            "response": [
+                {
+                    "name": "Access token - 12 hours",
+                    "originalRequest": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "https://access-control.api-coreservices-uat.aws.corelogic.io/access/oauth/token?grant_type=client_credentials&client_id={{client-id}}&client_secret={{client-secret}}",
+                            "host": [
+                                "https://access-control.api-coreservices-uat.aws.corelogic.io"
+                            ],
+                            "path": [
+                                "access",
+                                "oauth",
+                                "token"
+                            ],
+                            "query": [
+                                {
+                                    "key": "grant_type",
+                                    "value": "client_credentials"
+                                },
+                                {
+                                    "key": "client_id",
+                                    "value": "{{client-id}}"
+                                },
+                                {
+                                    "key": "client_secret",
+                                    "value": "{{client-secret}}"
+                                }
+                            ]
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Date",
+                            "value": "Sun, 19 Jun 2022 01:31:08 GMT"
+                        },
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        },
+                        {
+                            "key": "Transfer-Encoding",
+                            "value": "chunked"
+                        },
+                        {
+                            "key": "Connection",
+                            "value": "keep-alive"
+                        },
+                        {
+                            "key": "Set-Cookie",
+                            "value": "AWSALB=dkmrJZnxPuW5Q8Shm9YCBWkulxjIWALwBiItXERhCAfdqORyBIwOnHqe+Cg3fp5akUgvN5mvXzQ/qQOTC062vUPfUum+hMHhyy7ukyRrCoD2d8ke2c44DccEgCHz; Expires=Sun, 26 Jun 2022 01:31:02 GMT; Path=/"
+                        },
+                        {
+                            "key": "Set-Cookie",
+                            "value": "AWSALBCORS=dkmrJZnxPuW5Q8Shm9YCBWkulxjIWALwBiItXERhCAfdqORyBIwOnHqe+Cg3fp5akUgvN5mvXzQ/qQOTC062vUPfUum+hMHhyy7ukyRrCoD2d8ke2c44DccEgCHz; Expires=Sun, 26 Jun 2022 01:31:02 GMT; Path=/; SameSite=None"
+                        },
+                        {
+                            "key": "Cache-Control",
+                            "value": "no-store"
+                        },
+                        {
+                            "key": "Pragma",
+                            "value": "no-cache"
+                        },
+                        {
+                            "key": "X-Content-Type-Options",
+                            "value": "nosniff"
+                        },
+                        {
+                            "key": "X-XSS-Protection",
+                            "value": "1; mode=block"
+                        },
+                        {
+                            "key": "X-Frame-Options",
+                            "value": "DENY"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n    \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJDUlQiLCJNQVAiLCJQVFkiLCJTR1QiLCJTVFMiLCJUVEwiXSwicm9sZXMiOltdLCJpc3MiOiJodHRwczovL2FjY2Vzcy1hcGkuY29yZWxvZ2ljLmFzaWEiLCJlbnZfYWNjZXNzX3Jlc3RyaWN0Ijp0cnVlLCJleHAiOjE2NTU2NDU0NjIsImdlb19jb2RlcyI6W10sImNsaWVudF9pZCI6IjJjNWJiN2U1Iiwic291cmNlX2V4Y2x1c2lvbiI6W119.QXN7OEAndudOiA9EmNvsF79_vBDYrlnnD7X6ADgb56_e3lpuva5S6ekkghxAcRsDiRpZKVj6sb0063Y6RDEosBrFod5cNsFyowId0nhuzVlSNjqdigyD9oSf1N_1G5lXWV20L8G98yHvflLssiZzkTMmiIbkjpYomF1MTWYgEH0\",\n    \"token_type\": \"bearer\",\n    \"expires_in\": 43193,\n    \"scope\": \"CRT MAP PTY SGT STS TTL\",\n    \"iss\": \"https://access-api.corelogic.asia\",\n    \"env_access_restrict\": true,\n    \"geo_codes\": [],\n    \"roles\": [],\n    \"source_exclusion\": []\n}"
+                }
+            ]
+        }
+    ],
+    "auth": {
+        "type": "oauth2",
+        "oauth2": [
+            {
+                "key": "client_authentication",
+                "value": "body",
+                "type": "string"
+            },
+            {
+                "key": "scope",
+                "value": "openid",
+                "type": "string"
+            },
+            {
+                "key": "clientSecret",
+                "value": "{{client-secret}}",
+                "type": "string"
+            },
+            {
+                "key": "clientId",
+                "value": "{{client-id}}",
+                "type": "string"
+            },
+            {
+                "key": "accessTokenUrl",
+                "value": "https://access-uat-api.corelogic.asia/access/oauth/token",
+                "type": "string"
+            },
+            {
+                "key": "authUrl",
+                "value": "https://access-uat-api.corelogic.asia/access/oauth/authorize",
+                "type": "string"
+            },
+            {
+                "key": "redirect_uri",
+                "value": "{{client-redirect-uri}}",
+                "type": "string"
+            },
+            {
+                "key": "tokenName",
+                "value": "cl-user-token",
+                "type": "string"
+            },
+            {
+                "key": "addTokenTo",
+                "value": "header",
+                "type": "string"
+            }
+        ]
+    },
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Authentication Domains - set UAT or Production url's based on Environment selected",
+                    "if(pm.environment.name=\"uat\"){",
+                    "    pm.environment.set(\"access\", \"https://access-uat-api.corelogic.asia\"); ",
+                    "    pm.collectionVariables.set('access', 'https://access-uat.corelogic.asia');",
+                    "    pm.collectionVariables.set('rpp', 'https://rpp-uat.corelogic.asia');",
+                    "    pm.collectionVariables.set('rpnz', 'https://rpnz-uat.corelogic.co.nz');",
+                    "",
+                    "",
+                    "}else if(pm.environment.name=\"prod\"){",
+                    "    pm.environment.set(\"access\", \"https://access-api.corelogic.asia\"); ",
+                    "    pm.collectionVariables.set('access', 'https://access.corelogic.asia');",
+                    "    pm.collectionVariables.set('rpp', 'https://rpp.corelogic.asia');",
+                    "    pm.collectionVariables.set('rpnz', 'https://www.rpnz.co.nz');",
+                    "}else{",
+                    "    pm.environment.set(\"access\", \"https://access-uat-api.corelogic.asia\"); ",
+                    "    pm.collectionVariables.set('access', 'https://access-uat.corelogic.asia');",
+                    "    pm.collectionVariables.set('rpp', 'https://rpp-uat.corelogic.asia');",
+                    "    pm.collectionVariables.set('rpnz', 'https://rpnz-uat.corelogic.co.nz');",
+                    "}",
+                    "//-------Please set the below variables--------",
+                    "// ------------- OAuth Client Credentials or Authorization Code ----------",
+                    "// Authenticate - obtain token via client_credential or authorization_code grants:",
+                    "pm.collectionVariables.set('client-id', 'ai1i0u5FhPC2tQ07Vkt7aWqWhtMrn8pJ');",
+                    "pm.collectionVariables.set('client-secret', '0UIhekVQybUOusqw');",
+                    "// ------------- OAuth Client Credentials or Authorization Code ----------",
+                    "",
+                    "",
+                    "// ------------- OAuth Authorization Code grant --------------------------",
+                    "// Appliation Specific URI for this Client ID and Application ",
+                    "// This URL is configured as the redirect after successfully entering username and password.",
+                    "pm.collectionVariables.set('client-redirect-uri', ''); ",
+                    "pm.collectionVariables.set('client-app-key', 'RPP');",
+                    "",
+                    "// CoreLogic username and password - must have active access to the application",
+                    "pm.collectionVariables.set('username', '');",
+                    "pm.collectionVariables.set('password', '');",
+                    "// ------------- OAuth Authorization Code grant --------------------------",
+                    "",
+                    "",
+                    "// ------------- Integrated Application Silent Login ---------------------",
+                    "",
+                    "// Application silent login integrator API  - convert token to login session",
+                    "pm.collectionVariables.set('silent-api-key', '');",
+                    "pm.collectionVariables.set('silent-api-secret', '');",
+                    "pm.collectionVariables.set('silent-username', '');",
+                    "",
+                    "// ------------- Integrated Application Silent Login ---------------------"
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "access-lz",
+            "value": ""
+        },
+        {
+            "key": "client-id",
+            "value": ""
+        },
+        {
+            "key": "client-secret",
+            "value": ""
+        },
+        {
+            "key": "client-redirect-uri",
+            "value": ""
+        },
+        {
+            "key": "username",
+            "value": ""
+        },
+        {
+            "key": "password",
+            "value": ""
+        },
+        {
+            "key": "silent-app-key",
+            "value": ""
+        },
+        {
+            "key": "silent-client-id",
+            "value": ""
+        },
+        {
+            "key": "silent-client-secret",
+            "value": ""
+        },
+        {
+            "key": "silent-api-key",
+            "value": ""
+        },
+        {
+            "key": "silent-api-secret",
+            "value": ""
+        },
+        {
+            "key": "silent-cl-user-guid",
+            "value": ""
+        },
+        {
+            "key": "silent-redirect-uri",
+            "value": ""
+        },
+        {
+            "key": "silent-username",
+            "value": ""
+        },
+        {
+            "key": "silent-code",
+            "value": ""
+        },
+        {
+            "key": "access",
+            "value": ""
+        },
+        {
+            "key": "client-app-key",
+            "value": ""
+        },
+        {
+            "key": "environment",
+            "value": ""
+        },
+        {
+            "key": "rpp",
+            "value": ""
+        },
+        {
+            "key": "rpnz",
+            "value": ""
+        }
+    ]
+}

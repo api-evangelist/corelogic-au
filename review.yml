@@ -1,0 +1,429 @@
+aid: corelogic-au
+name: CoreLogic Australia
+review:
+  question: >-
+    Does CoreLogic Australia expose a real, reachable public developer API surface, and what is
+    its RESO posture in a market with no MLS?
+  answer: partial
+  date: '2026-07-26'
+  reviewer: API Evangelist
+  homeMarket: Australia
+  tier: valuation-avm
+
+sectorBlock:
+  homeMarket: Australia
+  legalEntity: >-
+    RP Data Pty Ltd, trading as Cotality (formerly CoreLogic Australia). The global CoreLogic brand
+    was retired in favour of Cotality during 2025; corelogic.com.au now 301-redirects to
+    www.cotality.com. The Australian and New Zealand developer surface, however, still runs on the
+    legacy corelogic.asia domain (developer.corelogic.asia, api.corelogic.asia,
+    access-uat-api.corelogic.asia) while production API hosts have migrated to *.api.cotality.com.au.
+
+  resoPosture:
+    certified: false
+    shortPhrase: >-
+      No RESO in Australia — CoreLogic's RESO Web API and Data Dictionary certifications belong to
+      Trestle, its United States MLS platform, not to this Australian surface.
+    verbatim: >-
+      CoreLogic holds real RESO certifications, but they are attached to Trestle, the company's
+      United States MLS data-distribution platform: Trestle's Web API earned RESO Platinum
+      certification (2018) on top of an existing Platinum Data Dictionary certification, and
+      CoreLogic subsequently received RESO Data Dictionary v2.0 vendor certification (published on
+      cotality.com). None of that applies to CoreLogic Australia. Australia has no MLS, no NAR, and
+      no RESO mandate; listings flow through the REA Group (realestate.com.au) and Domain portal
+      duopoly, and property records flow from state land registries and valuers-general.
+      Consequently there is no RESO Web API endpoint, no OData service root, no $metadata document,
+      and no RESO Universal Property Identifier anywhere in the Australian surface.
+    evidence:
+    - method: >-
+        Downloaded and string-searched the full Cotality Developer Portal JavaScript bundle
+        https://developer.corelogic.asia/static/main.aefa4bad.js (HTTP 200, 441,070 bytes,
+        2026-07-26).
+      result: >-
+        0 occurrences of "RESO", 0 of "OData", 0 of "$metadata", 0 of "swagger". The portal's only
+        machine-readable contract format is OpenAPI, rendered in an authenticated Swagger UI widget.
+    - method: >-
+        Analysed all 101 requests in the public "1. CoreLogic APIs AU Sample Sandbox Collection".
+      result: >-
+        Every request is proprietary REST/JSON against api.corelogic.asia. No OData query syntax
+        ($filter/$select/$expand), no /Property or /Member RESO resource names, no UPI.
+    - method: Probed https://api.corelogic.asia/$metadata anonymously.
+      result: >-
+        HTTP 404 with an Apigee fault body ("Unable to identify proxy for host: star.corelogic.asia"),
+        i.e. no OData metadata document is served.
+    - method: Probed https://www.reso.org/certified-organizations/ .
+      result: HTTP 404 — the RESO public certification directory did not resolve at that path on 2026-07-26.
+    resoIdentifiersUsed: >-
+      CoreLogic Australia uses its own opaque numeric CoreLogic property identifier (for example
+      45232760, 1092612) as the primary key across every API, resolved from free-text addresses via
+      the Address Matcher service. This is the Australian equivalent of a UPI, but it is a
+      proprietary CoreLogic identifier, not a RESO UPI.
+
+  accessGate:
+    classification: application-approval
+    whatADeveloperMustDoOrSign: >-
+      Two distinct gates. (1) SANDBOX — anyone can hit "Sign Up" on developer.corelogic.asia
+      (/signup, reCAPTCHA-protected, POST to the portal's /signup backend), verify an account
+      against Cotality's PingFederate identity provider at auth.corelogic.asia, then self-serve
+      create a sandbox client at /apps/create. The portal states verbatim: "Sandbox clients are
+      limited to the sandbox environment with a restricted dataset and API request quota. Use these
+      clients to develop your ideas and explore our APIs." Sandbox use is governed by a click-through
+      Sandbox agreement embedded in the portal bundle, which defines "Data" as property information,
+      ownership, sales, photographs, valuation, market-share analyses and index results, and states
+      the sandbox contains "only a limited and incomplete set of Data for evaluation purposes", with
+      confidentiality, IP and liability clauses and Australian Privacy Act 1988 (Cth) / Australian
+      Privacy Principles / Spam Act 2003 (Cth) / Do Not Call Register Act 2006 (Cth) obligations.
+      (2) PRODUCTION — requires a negotiated Cotality commercial data licence and provisioned
+      production OAuth credentials. There is no published self-serve path from sandbox to
+      production, no pricing page, and no plans document. Every production host answers 401 without
+      a token.
+    notSelfServe: >-
+      Classified application-approval rather than self-serve because the only thing a developer can
+      obtain unaided is a quota-limited, deliberately incomplete evaluation dataset. No production
+      Australian property, sales, valuation or auction data is obtainable without a signed
+      commercial agreement.
+
+  openData:
+    exists: false
+    note: >-
+      CoreLogic Australia publishes no open, unlicensed, publicly callable dataset. The CoreLogic
+      Home Value Index is released as free monthly commentary and press material, not as an open
+      API; the data itself is licensed. The Australian open-data counterweight in this sector sits
+      with government (state land registries, valuers-general, ABS, data.gov.au) and with PEXA's
+      mandated electronic conveyancing rail — not with CoreLogic. Every CoreLogic Australia endpoint
+      probed on 2026-07-26 returned 401 or 404.
+
+  authModel:
+    scheme: OAuth 2.0 (JWT bearer) over an Apigee gateway, with PingFederate OpenID Connect for portal users.
+    grantTypes:
+    - client_credentials
+    - authorization_code
+    - refresh_token
+    productionTokenEndpoints:
+    - https://access.api.cotality.com.au/as/token.oauth2 (POST, HTTP Basic base64 client_id:client_secret)
+    - https://access.api.cotality.com.au/oauth/token (POST, HTTP Basic base64 client_id:client_secret)
+    sandboxTokenEndpoint: https://api-sbox.corelogic.asia/access/as/token.oauth2?grant_type=client_credentials
+    legacyTokenEndpoint: https://api.corelogic.asia/access/oauth/token?grant_type=client_credentials
+    uatAuthHost: access-uat-api.corelogic.asia (/access/oauth/authorize, /access/login, /access/oauth/token, /access/userinfo, /access/logout)
+    tokenFormat: >-
+      JWT. The portal states the token response "is a JSON Web Token (JWT) and may be decoded to
+      obtain expiry time (a Unix epoch timestamp)", and warns that "Each grant_type token expiry is
+      subject to change without notice."
+    apiRequestAuth: Authorization header on every request; the portal states requests without a valid Authorization header will fail.
+    portalIdentityProvider: >-
+      PingFederate OpenID Connect at https://auth.corelogic.asia — anonymous discovery document
+      served at https://auth.corelogic.asia/.well-known/openid-configuration (HTTP 200, 2026-07-26).
+      issuer https://auth.corelogic.asia; authorization_endpoint /as/authorization.oauth2;
+      token_endpoint /as/token.oauth2; userinfo_endpoint /idp/userinfo.openid; jwks_uri /pf/JWKS;
+      registration_endpoint /as/clients.oauth2; device_authorization_endpoint /as/device_authz.oauth2.
+      scopes_supported: address, phone, openid, profile, email. Note these are the portal login
+      scopes, not data-product scopes — the data APIs use client_credentials with scope "openid" in
+      the vendor's own published sample tokens, and authorisation is carried in JWT claims
+      (roles, geo_codes, authorities), not in OAuth scopes.
+    gateway: >-
+      Apigee. Both api.corelogic.asia and *.api.cotality.com.au return Apigee fault envelopes
+      ({"fault":{"faultstring":"Unable to identify proxy for host: star.corelogic.asia ...",
+      "detail":{"errorcode":"messaging.adaptors.http.flow.ApplicationNotFound"}}}), and the developer
+      portal's own backend proxies app management to /apigee/apps.
+
+  developerPortal:
+    url: https://developer.corelogic.asia/
+    httpStatus: 200
+    confirmedSelfServePortal: true
+    platform: >-
+      Backstage (Spotify's developer portal framework) running in public app mode
+      (meta backstage-app-mode="public"), organization "Cotality", fronted by Imperva Incapsula.
+      Backend health check https://developer.corelogic.asia/api/dev-portal/health returns
+      {"status":"ok"} (HTTP 200).
+    publiclyReachableWithoutLogin: >-
+      The SPA shell, its JavaScript bundle, guide content compiled into that bundle, /signup and
+      the login flow. The API catalogue itself is not: /api/catalog/entities,
+      /api/catalog/entities/by-query, /api/dev-portal/apis, /api/dev-portal/products,
+      /api/dev-portal/apigee/apps and /api/search/query all return HTTP 401
+      {"error":{"name":"AuthenticationError","message":"Missing credentials"}}. The portal renders
+      OpenAPI definitions through an authenticated Swagger UI widget with the message "Log in or
+      Create an account" shown to guests, so the OpenAPI documents exist but are not anonymously
+      downloadable.
+    documentedRoutes:
+    - /apis
+    - /apis/psx-apis/psx-panel-lookup
+    - /apis/psx-apis/psx-subscribe
+    - /apis/psx-apis/psx-pull-notifications
+    - /apis/psx-apis/psx-expanded-search
+    - /apis/psx-apis/psx-get-order
+    - /apis/psx-apis/psx-update-order
+    - /apis/psx-apis/psx-cancel
+    - /apis/psx-apis/psx-attach-or-retrieve-documents
+    - /apis/psx-apis/psx-set-retrieved
+    - /apps
+    - /apps/create
+    - /products
+    - /projects
+    - /metrics
+    - /metrics/census
+    - /metrics/marketTrends
+    - /address_matcher
+    - /explore_charts_customisation
+    - /guides
+    - /guides/quick-start
+    - /guides/api-authentication
+    - /guides/application-silent-login
+    - /guides/charts-customisation
+    - /guides/environment-details
+    - /guides/mapping-services
+    - /guides/metric-types
+    - /guides/psx-implementation
+    - /guides/sandbox-test-data
+    - /guides/standards-and-conventions
+    - /guides/enterprise-apis/property-types
+    - /signup
+    - /user/register
+    - /faq
+    - /contact-us
+    - /terms-and-conditions
+    - /legal/privacy-policy
+    learningPlatform: https://campus.cotality.com (Skilljar; probed 2026-07-26, HTTP 403 to anonymous curl)
+
+  webhooksEventsSdksPostman:
+    webhooks: >-
+      No general webhook or event-subscription product is published. The only push-shaped surface is
+      the PSX valuation exchange, whose documented operations include psx-subscribe and
+      psx-pull-notifications — a subscribe-then-poll notification model, not HTTP callbacks.
+    asyncapi: None published. No WebSocket, SSE, or message-broker surface documented.
+    sdks: None published. No GitHub organisation for the Australian developer surface was found.
+    cli: None published.
+    postman: >-
+      Two genuine public Postman collections exist and were harvested verbatim (see harvestedArtifacts).
+    graphql: None. Every documented operation is REST/JSON (plus PNG image responses from the Charts API).
+    mcp: None published.
+    statusPage: None found.
+    llmsTxt: Not probed as present; no llms.txt referenced by the portal.
+
+  productApiFamily:
+    segmentationUsedByTheVendor: >-
+      The vendor's own public sandbox collection segments the surface into nine API families, which
+      this profile mirrors exactly rather than re-cutting: Access, Property Details, Property
+      Services, Search, AVM, Auction, Charts, Statistics, and Property Timeline — plus PSX
+      (valuation ordering) documented separately in the portal.
+    counts:
+      totalPublicSandboxRequests: 101
+      accessApi: 1
+      propertyDetailsApi: 13
+      propertyServicesApi: 31
+      searchApi: 22
+      avmApi: 10
+      auctionApi: 13
+      chartsApi: 4
+      statisticsApi: 4
+      propertyTimelineApi: 3
+      psxDocumentedOperations: 9
+    valueChainPosition: >-
+      Aggregator and valuation authority, not a listing portal and not a settlement rail. CoreLogic
+      Australia sits between the state land registries / valuers-general / agent listing campaigns
+      upstream, and banks, brokers, valuers, insurers and agents downstream. In the Australian seam
+      described for this study, the listing duopoly is REA Group and Domain, the settlement rail is
+      PEXA, and valuation data is split between PropTrack (REA-owned) and CoreLogic — this profile
+      covers the CoreLogic half of that valuation duopoly.
+
+harvestedArtifacts:
+- name: 1. CoreLogic APIs AU Sample Sandbox Collection
+  file: collections/corelogic-au-sample-sandbox.postman_collection.json
+  sourceURL: https://documenter.gw.postman.com/api/collections/7051651/S1EJWfxt
+  publishedAt: https://documenter.getpostman.com/view/7051651/S1EJWfxt
+  httpStatus: 200
+  fetchDate: '2026-07-26'
+  bytes: 81812
+  format: Postman Collection v2.0
+  parsed: true
+  requests: 101
+  hosts:
+  - api.corelogic.asia
+  note: >-
+    CoreLogic's own published sandbox starter collection. Base hosts inside it are Postman
+    variables ({{avm}}, {{search}}, {{auction}}, {{charts}}, {{statistics}}, {{content}},
+    {{prop-details}}, {{prop}}, {{propau}}, {{timeline}}) which are NOT resolved in the published
+    document; only the Access API request carries a literal host. Production hosts in apis.yml were
+    confirmed independently by DNS + HTTP probing, not inferred from these variables.
+- name: CL RP.Inside Auth Example
+  file: collections/corelogic-au-rp-inside-auth-example.postman_collection.json
+  sourceURL: https://api.corelogic.asia/content/docs/public/deep-link-postman.json
+  httpStatus: 200
+  fetchDate: '2026-07-26'
+  bytes: 67757
+  format: Postman Collection v2.1
+  parsed: true
+  requests: 12
+  hosts:
+  - access-uat-api.corelogic.asia
+  note: >-
+    Served anonymously straight off the Apigee gateway and linked from the portal's Application
+    Silent Login guide. Demonstrates the authorization_code grant, refresh_token grant,
+    client_credentials grant, userinfo, logout, and RP Data / RP.NZ deep-link silent login. The
+    vendor's own published sample values include expired UAT JWTs and a sample apiKey; they are
+    retained verbatim because they are CoreLogic's published document, and the embedded role and
+    geo_code claim lists are useful evidence that authorisation is claim-based rather than
+    scope-based.
+noOpenAPIHarvested: >-
+  No OpenAPI document, no OData $metadata, and no other machine-readable API description could be
+  retrieved anonymously. The portal does hold OpenAPI definitions (it renders them in a Swagger UI
+  widget) but serves them only from the authenticated Backstage catalogue, which returned HTTP 401
+  to every anonymous probe. The openapi/ directory is therefore intentionally absent.
+
+probes:
+- url: https://corelogic.com.au
+  status: 301
+  note: redirects to https://www.cotality.com/ (HTTP 200)
+- url: https://www.corelogic.com.au
+  status: 301
+  note: redirects to https://www.cotality.com/ (HTTP 200)
+- url: https://www.cotality.com/au
+  status: 200
+- url: https://www.cotality.com/au/products
+  status: 200
+- url: https://www.cotality.com/au/industries/developers
+  status: 200
+- url: https://developer.corelogic.asia/
+  status: 200
+  note: Cotality Developer Portal, Backstage SPA
+- url: https://developer.corelogic.asia/static/main.aefa4bad.js
+  status: 200
+  note: 441,070 bytes; searched for RESO/OData/$metadata (0 hits)
+- url: https://developer.corelogic.asia/api/dev-portal/health
+  status: 200
+  note: '{"status":"ok"}'
+- url: https://developer.corelogic.asia/api/catalog/entities
+  status: 401
+- url: https://developer.corelogic.asia/api/catalog/entities?filter=kind=api
+  status: 401
+- url: https://developer.corelogic.asia/api/catalog/entities/by-query
+  status: 401
+- url: https://developer.corelogic.asia/api/dev-portal/apis
+  status: 401
+- url: https://developer.corelogic.asia/api/dev-portal/products
+  status: 401
+- url: https://developer.corelogic.asia/api/dev-portal/apigee/apps
+  status: 401
+- url: https://developer.corelogic.asia/api/search/query?term=api
+  status: 401
+- url: https://developer.corelogic.asia/openapi.json
+  status: 200
+  note: SPA shell HTML, not a spec
+- url: https://developer.corelogic.asia/swagger.json
+  status: 200
+  note: SPA shell HTML, not a spec
+- url: https://developer.corelogic.asia/api-docs
+  status: 200
+  note: SPA shell HTML, not a spec
+- url: https://auth.corelogic.asia/.well-known/openid-configuration
+  status: 200
+  note: PingFederate OIDC discovery document, 5,611 bytes
+- url: https://api.corelogic.asia/
+  status: 404
+  note: Apigee fault, host star.corelogic.asia
+- url: https://api.corelogic.asia/$metadata
+  status: 404
+  note: Apigee fault — no OData metadata served
+- url: https://api.corelogic.asia/openapi.json
+  status: 404
+- url: https://api.corelogic.asia/access/oauth/token?grant_type=client_credentials
+  status: 401
+  note: '{"error":"unauthorized","error_description":"There is no client authentication..."}'
+- url: https://api.corelogic.asia/content/docs/public/deep-link-postman.json
+  status: 200
+  note: public Postman collection, harvested
+- url: https://api-sbox.corelogic.asia/access/as/token.oauth2?grant_type=client_credentials
+  status: 502
+  note: Apigee 405-without-Allow on GET; documented as POST
+- url: https://access.api.cotality.com.au/
+  status: 401
+  note: '{"messages":[{"type":"ERROR","message":"Access token is missing"}]}'
+- url: https://access.api.cotality.com.au/oauth/token?grant_type=client_credentials
+  status: 401
+- url: https://property-details.api.cotality.com.au/
+  status: 401
+- url: https://search.api.cotality.com.au/
+  status: 401
+- url: https://avm.api.cotality.com.au/
+  status: 401
+- url: https://auction.api.cotality.com.au/
+  status: 401
+- url: https://charts.api.cotality.com.au/
+  status: 401
+- url: https://statistics.api.cotality.com.au/
+  status: 401
+- url: https://property-timeline.api.cotality.com.au/
+  status: 401
+- url: https://content.api.cotality.com.au/
+  status: 401
+- url: https://suggest.api.cotality.com.au/
+  status: 401
+- url: https://matcher.api.cotality.com.au/
+  status: 401
+- url: https://notreal-control.api.cotality.com.au/
+  status: 0
+  note: >-
+    DNS NXDOMAIN — deliberate control probe proving the *.api.cotality.com.au hosts above are
+    individually provisioned real hosts, not a catch-all wildcard.
+- url: https://developer.corelogic.com.au
+  status: 0
+  note: DNS NXDOMAIN
+- url: https://developers.corelogic.com.au
+  status: 0
+  note: DNS NXDOMAIN
+- url: https://api.corelogic.com.au
+  status: 0
+  note: DNS NXDOMAIN
+- url: https://docs.corelogic.com.au
+  status: 0
+  note: DNS NXDOMAIN
+- url: https://www.corelogic.com.au/developers
+  status: 404
+- url: https://www.corelogic.com.au/api
+  status: 404
+- url: https://www.corelogic.com.au/docs
+  status: 404
+- url: https://api.cotality.com.au/
+  status: 404
+- url: https://campus.cotality.com
+  status: 403
+- url: https://www.reso.org/certified-organizations/
+  status: 404
+
+sources:
+- url: https://developer.corelogic.asia/
+  type: DeveloperPortal
+  note: Cotality Developer Portal — Backstage SPA; title "Cotality Developer Portal"; description "The central hub for all things related to Cotality APIs."
+- url: https://documenter.getpostman.com/view/7051651/S1EJWfxt
+  type: PostmanCollection
+  note: Public "1. CoreLogic APIs AU Sample Sandbox Collection" — 101 requests, the primary evidence for the API family.
+- url: https://api.corelogic.asia/content/docs/public/deep-link-postman.json
+  type: PostmanCollection
+  note: Public RP.Inside auth example collection served anonymously off the gateway.
+- url: https://auth.corelogic.asia/.well-known/openid-configuration
+  type: WellKnown
+  note: PingFederate OIDC discovery — the portal identity provider.
+- url: https://www.cotality.com/au/products
+  type: Documentation
+  note: Australian product listing; names Commercial API and Construction API among AVM, Cordell, Cityscope and valuation products.
+- url: https://www.cotality.com/resources/article/corelogic-achieves-reso-data-dictionary-v2-0-vendor-certification
+  type: Article
+  note: CoreLogic's RESO Data Dictionary v2.0 vendor certification — a Trestle/US-platform certification, not Australian.
+- url: https://www.wavgroup.com/2018/09/25/corelogic-trestle-web-api-earns-reso-platinum-certification/
+  type: Article
+  note: Trestle Web API RESO Platinum certification (2018) — again the US MLS platform.
+
+notes:
+  imagePlaceholder: >-
+    image is set to the network S3 icon convention
+    (https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/corelogic-au.png) and will be
+    populated by the icon backfill. A real brand icon is available at
+    https://developer.corelogic.asia/favicon.png (HTTP 200, image/png, 29,637 bytes) if a direct
+    source is ever wanted.
+  relatedRepo: >-
+    all/corelogic profiles the United States/global CoreLogic (Cotality) entity and its Trestle
+    RESO Web API. This repo deliberately covers only the Australian surface; the two share a parent
+    company but not an API platform, an identity provider, or a standards posture.
+  bootstrapScope: >-
+    Identity + honest public-API capture + spec harvest only. Enrichment artifacts
+    (authentication/, security/, plans/, rate-limits/, scopes/, blogs/) are produced by the separate
+    enrichment pipeline.
