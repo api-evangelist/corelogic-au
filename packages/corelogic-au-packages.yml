@@ -1,0 +1,88 @@
+generated: '2026-07-26'
+method: searched
+source: >-
+  npm registry search, PyPI, NuGet (azuresearch-usnc.nuget.org), RubyGems, Packagist,
+  https://developer.corelogic.asia/ (portal bundle string search), https://github.com/corelogic
+finding: >-
+  Cotality publishes NO first-party client library for the Australian or New Zealand APIs. The
+  Cotality Developer Portal has no SDK page, no downloads section and no code-sample library beyond
+  cURL snippets; its GitHub organisation (github.com/corelogic) has zero public repositories; and
+  nothing named cotality exists on npm, PyPI, NuGet, RubyGems, Packagist or crates.io. The two
+  Postman collections in collections/ are the only client-side integration assets the vendor
+  ships. Everything listed below is third-party or belongs to the United States CoreLogic surface,
+  and none of it is marked official.
+official_sdk_count: 0
+packages:
+- language: javascript
+  registry: npm
+  name: corelogic
+  url: https://www.npmjs.com/package/corelogic
+  install: npm install corelogic
+  version: 1.0.3
+  last_published: '2022-06-14'
+  publisher: cjpartridge (chrisp@dynamicmethods.com.au)
+  official: false
+  note: >-
+    Third-party "Corelogic API client" from an Australian integrator (Dynamic Methods). Published
+    2016, last touched 2022, no repository or homepage declared. Not endorsed by Cotality.
+- language: ruby
+  registry: rubygems
+  name: corelogic-ruby
+  url: https://rubygems.org/gems/corelogic-ruby
+  install: gem install corelogic-ruby
+  version: 1.0.1
+  repository: https://github.com/jetrockets/corelogic-ruby
+  author: Ilia Kriachkov (JetRockets)
+  official: false
+  note: >-
+    Third-party wrapper for the CoreLogic Property API pointing at developer.corelogic.com — the
+    United States developer surface, not developer.corelogic.asia. Not applicable to the Australian
+    APIs.
+- language: ruby
+  registry: rubygems
+  name: omniauth-core-logic
+  url: https://rubygems.org/gems/omniauth-core-logic
+  official: false
+  note: Third-party OmniAuth OAuth2 strategy for CoreLogic login. US surface.
+- language: dotnet
+  registry: nuget
+  name: CoreLogic.Services.Wvs
+  url: https://www.nuget.org/packages/CoreLogic.Services.Wvs
+  version: 1.0.19
+  repository: https://github.com/Georadix/CoreLogic-WVS
+  authors_field: CoreLogic
+  official: false
+  note: >-
+    Wrapper for CoreLogic Weather Verification Services — a United States insurance product. The
+    NuGet authors field says "CoreLogic" but the source repository belongs to Georadix, a third
+    party. Not an Australian API client.
+- language: dotnet
+  registry: nuget
+  name: CoreLogic.Services.Sws
+  url: https://www.nuget.org/packages/CoreLogic.Services.Sws
+  version: 1.0.13
+  repository: https://github.com/Georadix/CoreLogic-SWS
+  authors_field: CoreLogic
+  official: false
+  note: >-
+    Wrapper for CoreLogic Spatial Web Services — again a United States product published from a
+    third-party repository.
+registries_probed:
+- {registry: npm, query: 'cotality', result: no packages}
+- {registry: npm, query: 'corelogic', result: '1 relevant third-party package'}
+- {registry: pypi, probed: [corelogic, cotality, rp-data, intellival, corelogic-api], result: all 404}
+- {registry: nuget, query: 'corelogic', result: '4 hits, none first-party for AU'}
+- {registry: rubygems, query: 'corelogic', result: '2 third-party gems, both US surface'}
+- {registry: packagist, query: 'corelogic', result: no CoreLogic/Cotality packages}
+- {registry: github, org: 'https://github.com/corelogic', result: 'org exists, 0 public repositories'}
+integration_assets_shipped_by_vendor:
+- type: PostmanCollection
+  name: 1. CoreLogic APIs AU Sample Sandbox Collection
+  file: collections/corelogic-au-sample-sandbox.postman_collection.json
+  url: https://documenter.getpostman.com/view/7051651/S1EJWfxt
+  requests: 101
+- type: PostmanCollection
+  name: CL RP.Inside Auth Example
+  file: collections/corelogic-au-rp-inside-auth-example.postman_collection.json
+  url: https://api.corelogic.asia/content/docs/public/deep-link-postman.json
+  requests: 12

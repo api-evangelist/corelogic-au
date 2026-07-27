@@ -1,0 +1,77 @@
+generated: '2026-07-26'
+method: searched
+source: live probes of every apis.yml host on 2026-07-26
+note: >-
+  Two real /.well-known/ documents exist across the CoreLogic Australia / Cotality estate, both on
+  the PingFederate identity host auth.corelogic.asia. Every *.api.cotality.com.au production host
+  answers 401 "Access token is missing" to ANY path — including /.well-known/* — so a 401 there is
+  a gate, not a 404, and no discovery surface can be read anonymously. The Backstage developer
+  portal at developer.corelogic.asia is a single-page app that serves its HTML shell with HTTP 200
+  for every unknown path; /.well-known/security.txt, /llms.txt, /.well-known/api-catalog and
+  /.well-known/ai-plugin.json all returned 200 there but the body is <!DOCTYPE html>, so they are
+  recorded as shell (not present). No security.txt exists anywhere on cotality.com,
+  corelogic.asia or corelogic.com.au.
+hosts:
+- host: https://auth.corelogic.asia
+  role: identity provider (PingFederate) for the Cotality Developer Portal
+- host: https://developer.corelogic.asia
+  role: Backstage developer portal (SPA, catch-all 200)
+- host: https://api.corelogic.asia
+  role: legacy Apigee gateway
+- host: https://www.cotality.com
+  role: corporate website
+- host: https://access.api.cotality.com.au
+  role: production OAuth token service
+documents:
+- path: /.well-known/openid-configuration
+  host: https://auth.corelogic.asia
+  status: 200
+  file: corelogic-au-openid-configuration.json
+  bytes: 5611
+  note: PingFederate OIDC discovery — issuer https://auth.corelogic.asia
+- path: /.well-known/oauth-authorization-server
+  host: https://auth.corelogic.asia
+  status: 200
+  file: corelogic-au-oauth-authorization-server.json
+  note: RFC 8414 authorization server metadata — same issuer, 40 keys
+- path: /.well-known/security.txt
+  host: https://auth.corelogic.asia
+  status: 404
+- path: /.well-known/security.txt
+  host: https://www.cotality.com
+  status: 404
+- path: /.well-known/security.txt
+  host: https://api.corelogic.asia
+  status: 404
+- path: /.well-known/security.txt
+  host: https://developer.corelogic.asia
+  status: 200
+  present: false
+  note: SPA shell HTML, not RFC 9116 text
+- path: /.well-known/api-catalog
+  host: https://developer.corelogic.asia
+  status: 200
+  present: false
+  note: SPA shell HTML
+- path: /.well-known/ai-plugin.json
+  host: https://developer.corelogic.asia
+  status: 200
+  present: false
+  note: SPA shell HTML
+- path: /llms.txt
+  host: https://developer.corelogic.asia
+  status: 200
+  present: false
+  note: SPA shell HTML — no provider-published llms.txt
+- path: /.well-known/oauth-protected-resource
+  host: https://auth.corelogic.asia
+  status: 404
+- path: /.well-known/*
+  host: https://access.api.cotality.com.au
+  status: 401
+  note: 'gateway answers {"messages":[{"type":"ERROR","message":"Access token is missing"}]} for every path'
+- path: /.well-known/*
+  host: https://search.api.cotality.com.au
+  status: 401
+  note: same gate as every other *.api.cotality.com.au host
+security_txt: none

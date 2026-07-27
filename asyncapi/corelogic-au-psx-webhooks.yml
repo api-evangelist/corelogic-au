@@ -1,0 +1,97 @@
+generated: '2026-07-26'
+method: searched
+spec_type: Webhooks
+asyncapi_published: false
+source: >-
+  https://developer.corelogic.asia/guides/psx-implementation (PSX Implementation Guide, compiled
+  into the developer-portal bundle main.aefa4bad.js, HTTP 200 2026-07-26) plus the PSX operation
+  pages under https://developer.corelogic.asia/apis/psx-apis/
+summary: >-
+  CoreLogic Australia publishes no AsyncAPI document, no WebSocket, no SSE and no message broker.
+  It does publish one genuine event surface: the PSX valuation ordering exchange, which offers BOTH
+  pull and push notifications for a valuation job as it moves through the workflow. Push
+  notifications are HTTP callbacks to a customer-supplied web hook URL, with optional OAuth 2.0
+  authentication on the callback. This is the estate's only webhook contract and it is
+  product-specific — none of the property, valuation, auction, statistics or charts APIs emit
+  events of any kind.
+scope:
+  product: PSX (valuation ordering exchange)
+  audience: lenders, brokers and integrating platforms with a PSX commercial agreement
+  general_api_events: none
+methodologies:
+- name: pull
+  operation: psx-pull-notifications
+  docs: https://developer.corelogic.asia/apis/psx-apis/psx-pull-notifications
+  model: >-
+    Subscribe with psx-subscribe, then poll for queued notifications. The implementation guide
+    presents this as the baseline methodology with an explicit recommendation attached.
+  subscribe_operation: psx-subscribe
+  subscribe_docs: https://developer.corelogic.asia/apis/psx-apis/psx-subscribe
+- name: push
+  model: HTTP callback (web hook)
+  verbatim: >-
+    "Push notifications can be utilised to allow for real-time updates of jobs as events occur.
+    Where a Customer includes a web hook URL in their order request, or where the URL has been
+    configured against the Customer profile, the PSX will send notifications to that URL. PSX also
+    allows oAuth2 authentication for push notifications. Customer can opt to use the standard
+    authentication or oAuth integration."
+  registration:
+  - per-order — a web hook URL supplied in the order request
+  - per-customer — a web hook URL configured against the customer profile
+  callback_authentication: [standard authentication, OAuth 2.0]
+  retry_policy: not published
+  signature_scheme: not published
+  payload_schema: not published anonymously
+event_categories:
+- category: workflow status transition
+  description: >-
+    A valuation job moving between states in the documented PSX valuation workflow. The guide notes
+    "a job will not necessarily transition through all of these states. For example, an AVM will
+    typically transition directly from instructed to completed. Most of the job's status are
+    informational... however those highlighted in red require action from the job order for the job
+    to proceed."
+- category: action update
+  description: >-
+    Notification types the guide groups under "Action Updates" — events that require the ordering
+    platform to act before the job can proceed.
+- category: delay
+  description: >-
+    Notification types the guide groups under "Delays" — events reporting that a job has been held
+    up.
+- category: quote
+  description: >-
+    Where no fixed panel fee applies, quote requests go to each valuation firm on the lender's
+    panel and the resulting quote list is returned for acceptance; quotes may alternatively be
+    accepted by email.
+- category: completion / retrieval
+  description: >-
+    Job completion, valuation retrieval (a PDF report), post-completion query, amend report, update
+    valuation, and conversion reporting via psx-set-retrieved.
+related_operations:
+- {operation: psx-panel-lookup, docs: 'https://developer.corelogic.asia/apis/psx-apis/psx-panel-lookup'}
+- {operation: psx-subscribe, docs: 'https://developer.corelogic.asia/apis/psx-apis/psx-subscribe'}
+- {operation: psx-pull-notifications, docs: 'https://developer.corelogic.asia/apis/psx-apis/psx-pull-notifications'}
+- {operation: psx-expanded-search, docs: 'https://developer.corelogic.asia/apis/psx-apis/psx-expanded-search'}
+- {operation: psx-get-order, docs: 'https://developer.corelogic.asia/apis/psx-apis/psx-get-order'}
+- {operation: psx-update-order, docs: 'https://developer.corelogic.asia/apis/psx-apis/psx-update-order'}
+- {operation: psx-cancel, docs: 'https://developer.corelogic.asia/apis/psx-apis/psx-cancel'}
+- {operation: psx-attach-or-retrieve-documents, docs: 'https://developer.corelogic.asia/apis/psx-apis/psx-attach-or-retrieve-documents'}
+- {operation: psx-set-retrieved, docs: 'https://developer.corelogic.asia/apis/psx-apis/psx-set-retrieved'}
+adjacent_notification_services:
+- name: Notification Services
+  production: https://notification.api.cotality.com.au
+  uat: https://notification.api-uat.cotality.com.au
+  status: >-
+    Listed in the Cotality environment table and excluded from the sandbox ("Property Monitor and
+    Notification"). Probed anonymously 2026-07-26 — HTTP 401. No documentation of its event
+    catalogue is published anonymously, so nothing is asserted about its shape.
+- name: Property Monitor Services
+  production: https://property-monitor.api.cotality.com.au
+  uat: https://property-monitor.api-uat.cotality.com.au
+  status: >-
+    Same — a change-monitoring product, excluded from the sandbox, 401 to anonymous probes, no
+    published event contract.
+not_fabricated: >-
+  No AsyncAPI channel, message or schema is invented here. Only the notification model Cotality
+  documents in prose is recorded. If the PSX payload schemas become retrievable, this file should
+  be upgraded to a real AsyncAPI document.

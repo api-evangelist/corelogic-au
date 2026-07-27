@@ -1,0 +1,63 @@
+generated: '2026-07-26'
+method: searched
+source: https://auth.corelogic.asia/.well-known/openid-configuration
+docs: https://developer.corelogic.asia/guides/api-authentication
+finding: >-
+  CoreLogic Australia has NO data-product OAuth scope surface. The only scopes published anywhere
+  on the estate are the five PingFederate identity scopes advertised by the developer-portal
+  identity provider, which govern human login to the portal — not access to property, valuation,
+  auction or statistics data. The vendor's own published sample client_credentials token requests
+  carry scope "openid" and nothing else; entitlement to data products is carried in JWT claims
+  (roles, geo_codes, authorities) provisioned against a signed commercial licence, so a developer
+  cannot request finer-grained access by asking for a scope. This is the recorded model, not an
+  absence of research.
+authorization_model: claims-based (roles / geo_codes / authorities in the JWT), not scope-based
+schemes:
+- name: CotalityDeveloperPortalOIDC
+  source: well-known/corelogic-au-openid-configuration.json
+  issuer: https://auth.corelogic.asia
+  applies_to: developer portal human login
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: https://auth.corelogic.asia/as/authorization.oauth2
+    tokenUrl: https://auth.corelogic.asia/as/token.oauth2
+  - flow: clientCredentials
+    tokenUrl: https://auth.corelogic.asia/as/token.oauth2
+  - flow: implicit
+    authorizationUrl: https://auth.corelogic.asia/as/authorization.oauth2
+scopes:
+- scope: openid
+  description: >-
+    OpenID Connect base scope. The only scope observed in Cotality's own published data-API token
+    requests (client_credentials against access.api.cotality.com.au).
+  flows: [authorizationCode, clientCredentials, implicit]
+  sources: [well-known/corelogic-au-openid-configuration.json]
+- scope: profile
+  description: Standard OIDC profile claims for the portal user.
+  flows: [authorizationCode, implicit]
+  sources: [well-known/corelogic-au-openid-configuration.json]
+- scope: email
+  description: Standard OIDC email claim for the portal user.
+  flows: [authorizationCode, implicit]
+  sources: [well-known/corelogic-au-openid-configuration.json]
+- scope: phone
+  description: Standard OIDC phone claim for the portal user.
+  flows: [authorizationCode, implicit]
+  sources: [well-known/corelogic-au-openid-configuration.json]
+- scope: address
+  description: Standard OIDC address claim for the portal user.
+  flows: [authorizationCode, implicit]
+  sources: [well-known/corelogic-au-openid-configuration.json]
+grant_types_supported:
+- implicit
+- authorization_code
+- refresh_token
+- password
+- client_credentials
+- urn:pingidentity.com:oauth2:grant_type:validate_bearer
+- urn:ietf:params:oauth:grant-type:jwt-bearer
+- urn:ietf:params:oauth:grant-type:saml2-bearer
+- urn:ietf:params:oauth:grant-type:device_code
+- urn:ietf:params:oauth:grant-type:token-exchange
+- urn:openid:params:grant-type:ciba
+data_api_grant_types_documented: [client_credentials, authorization_code, refresh_token]

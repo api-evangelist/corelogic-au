@@ -1,0 +1,116 @@
+generated: '2026-07-26'
+method: searched
+source: >-
+  https://developer.corelogic.asia/faq (backwards-compatibility policy),
+  https://developer.corelogic.asia/guides/environment-details (three-environment model and the
+  full production/UAT host table, with services explicitly marked deprecated), live probes
+  2026-07-26
+docs: https://developer.corelogic.asia/guides/environment-details
+versioning:
+  scheme: uri-path, versioned per service rather than estate-wide
+  observed_versions: [v1, v2]
+  examples:
+  - /au/v1/property/comparables.json
+  - /au/v2/suggest.json
+  - /charts/v2/chart.png
+  - /v1/statistics.json
+  note: >-
+    Newer service families (Property Details, Search, Auction, Property Timeline) carry no version
+    segment at all — only the older Property Services family and Charts/Statistics do.
+deprecation:
+  policy_url: https://developer.corelogic.asia/faq
+  policy_verbatim: >-
+    "As we continue to develop and improve Cotality APIs, service method request and response
+    objects will evolve over time. As such, we strive to ensure that new functionality is backwards
+    compatible. However, if a change to existing input or output objects is required (i.e. breaking
+    changes), we will introduce a new version of the service, allowing the integration of older
+    versions to still be supported for a reasonable length of time before removal. We will attempt
+    to notify you in advance of any updates to our Cotality APIs prior to release."
+  policy_published: true
+  sunset_header: false
+  deprecation_header: false
+  notice_period: >-
+    Not quantified. "A reasonable length of time" and "we will attempt to notify you in advance"
+    are the only commitments published; no fixed window, no RFC 8594 Sunset/Deprecation header
+    support is documented or observable anonymously.
+  deprecated_services:
+  - name: Property Services AU
+    production: https://property-au.api.cotality.com.au
+    uat: https://property-au.api-uat.cotality.com.au
+    sandbox: https://api-sbox.corelogic.asia/property/au
+    marked: >-
+      Labelled "(deprecated)" in the environment-details host table on the Cotality Developer
+      Portal. This is the /au/v1/ and /au/v2/ family — comparables, geo sales search, suggest,
+      advertisements, pros-and-cons, validation — 31 of the 101 requests in the vendor's own
+      published sandbox collection.
+    successor: >-
+      Search Services (search.api.cotality.com.au) and Property Details Services
+      (property-details.api.cotality.com.au) carry the equivalent capability without a version
+      segment.
+  - name: Property Services NZ
+    production: https://property-nz.api.cotality.co.nz
+    uat: https://property-nz.api-uat.cotality.co.nz
+    sandbox: https://api-sbox.corelogic.asia/property/nz
+    marked: Labelled "(deprecated)" in the environment-details host table.
+environments:
+  count: 3
+  model: sandbox -> UAT -> production, promotion gated on a signed commercial licence
+  sandbox:
+    host: https://api-sbox.corelogic.asia
+    self_serve: true
+    detail: sandbox/corelogic-au-sandbox.yml
+  uat:
+    host_pattern: https://<service>.api-uat.cotality.com.au
+    self_serve: false
+  production:
+    host_pattern: https://<service>.api.cotality.com.au
+    self_serve: false
+  token_binding: >-
+    Tokens do not cross environments. The FAQ documents "Invalid token provided." for a token
+    minted in one environment and used in another.
+health_endpoints:
+  pattern: GET <service-root>/env/health
+  published_for:
+  - https://avm.api.cotality.com.au/env/health
+  - https://auction.api.cotality.com.au/env/health
+  - https://charts.api.cotality.com.au/env/health
+  - https://property-details.api.cotality.com.au/env/health
+  - https://property-timeline.api.cotality.com.au/env/health
+  - https://search.api.cotality.com.au/env/health
+  - https://statistics.api.cotality.com.au/env/health
+  - https://property-au.api.cotality.com.au/au/env/health
+  note: >-
+    Authenticated — probed anonymously 2026-07-26 and returned 401 "Access token is missing" like
+    every other path. Useful to licensed integrators, not a public status surface.
+status_page:
+  australian_status_page: none
+  parent_company_status_page: https://status.cotality.com
+  parent_scope: >-
+    Live (HTTP 200) but titled "Status Page (US)" and served as a client-side app that returns the
+    same HTML shell for /api/v2/summary.json and every other path, so no component list can be read
+    and no Australian service is shown. No status.corelogic.asia, no status host under
+    cotality.com.au. Recorded for completeness; NOT wired as an Australian status page because it
+    does not cover this surface.
+sla:
+  published: false
+  note: >-
+    No uptime target, no SLA document and no support-response commitment is published on the
+    anonymous surface. Both are matters for the negotiated commercial data licence.
+changelog:
+  published: false
+  note: >-
+    No changelog, release-notes or "what's new" route exists on the Cotality Developer Portal —
+    the word "changelog" does not occur in the portal bundle. The FAQ's backwards-compatibility
+    answer is the only change-management artifact, and the portal states that "The API products are
+    documentation coupled with the API releases", i.e. documentation is the release record.
+data_lifecycle:
+  identifier_churn: >-
+    Property identifiers are explicitly not permanent — the FAQ documents deduplication, obsoleting,
+    and split/merge as reasons a saved property id stops resolving.
+  refresh_cadence:
+  - product: Commercial API
+    claim: '"refreshing data within 24 hours"'
+    source: https://www.cotality.com/au/products/commercial-api
+  - product: Construction API
+    claim: '"any new data within seconds of our systems being updated"'
+    source: https://www.cotality.com/au/products/construction-api

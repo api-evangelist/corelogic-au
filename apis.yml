@@ -92,11 +92,15 @@ apis:
     The older versioned property services family — comparables, geo sales search by polygon,
     locality, postcode and street, property and parcel suggest, point search, for-sale and for-rent
     advertisements, property pros-and-cons, marketing contacts, and property validation. Thirty-one
-    operations are published in the sandbox collection under /au/v1/* and /au/v2/*. The collection
-    references this family through unresolved Postman variables, so no production base URL is
-    asserted here; the suggest and address-matcher hosts suggest.api.cotality.com.au and
-    matcher.api.cotality.com.au both resolve and answered HTTP 401 on 2026-07-26.
-  humanURL: https://developer.corelogic.asia/apis
+    operations are published in the sandbox collection under /au/v1/* and /au/v2/*. The Cotality
+    Developer Portal environment-details guide names this family "Property Services AU
+    (deprecated)" and publishes its production host as property-au.api.cotality.com.au (UAT
+    property-au.api-uat.cotality.com.au, sandbox api-sbox.corelogic.asia/property/au). Probed
+    anonymously on 2026-07-26 and returned HTTP 401. Search Services and Property Details Services
+    carry the equivalent capability without a version segment.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://property-au.api.cotality.com.au
+  deprecated: true
   tags:
   - Property Search
   - Comparables
@@ -105,6 +109,8 @@ apis:
   properties:
   - type: Documentation
     url: https://developer.corelogic.asia/apis
+  - type: Deprecation
+    url: lifecycle/corelogic-au-lifecycle.yml
   - type: PostmanCollection
     url: collections/corelogic-au-sample-sandbox.postman_collection.json
 - aid: corelogic-au:corelogic-au-search-api
@@ -288,7 +294,260 @@ apis:
     url: https://developer.corelogic.asia/apis/psx-apis/psx-attach-or-retrieve-documents
   - type: Documentation
     url: https://developer.corelogic.asia/apis/psx-apis/psx-set-retrieved
+  - type: Webhooks
+    url: asyncapi/corelogic-au-psx-webhooks.yml
+- aid: corelogic-au:corelogic-au-commercial-api
+  name: CoreLogic Australia Commercial API
+  description: >-
+    Commercial property data delivered into a licensee's own systems — market research, commercial
+    valuations and comparable sales analysis, sharing the Cotality property identifier so commercial
+    records join to the residential spine. The product page states the API refreshes data within 24
+    hours. Host published in the Cotality Developer Portal environment-details guide (sandbox
+    api-sbox.corelogic.asia/commercial-api); probed anonymously on 2026-07-26 and returned HTTP 401.
+    No operation list is published anonymously.
+  humanURL: https://www.cotality.com/au/products/commercial-api
+  baseURL: https://commercial.api.cotality.com.au
+  tags:
+  - Commercial Real Estate
+  - Property Data
+  - Comparables
+  properties:
+  - type: Documentation
+    url: https://www.cotality.com/au/products/commercial-api
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-construction-api
+  name: CoreLogic Australia Construction API
+  description: >-
+    Live Cordell construction cost and project intelligence — project activity, builder profiles and
+    contact information — delivered into customer-facing platforms, apps and quoting or planning
+    tools. The product page claims new data becomes available within seconds of entry. Host
+    published in the Cotality Developer Portal environment-details guide (sandbox
+    api-sbox.corelogic.asia/construction-api); probed anonymously on 2026-07-26 and returned HTTP
+    401. No operation list is published anonymously.
+  humanURL: https://www.cotality.com/au/products/construction-api
+  baseURL: https://construction.api.cotality.com.au
+  tags:
+  - Construction
+  - Cordell
+  - Building Intelligence
+  properties:
+  - type: Documentation
+    url: https://www.cotality.com/au/products/construction-api
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-insurance-api
+  name: CoreLogic Australia Insurance API
+  description: >-
+    Insurance-facing property data service. Named and hosted in the Cotality Developer Portal
+    environment-details guide, and included in the sandbox at api-sbox.corelogic.asia/insurance.
+    Probed anonymously on 2026-07-26 and returned HTTP 401. No operation list, schema or
+    documentation route is published outside the authenticated portal, so nothing beyond the host
+    and sandbox availability is asserted here.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://insurance.api.cotality.com.au
+  tags:
+  - Property Insurance
+  - Property Data
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-property-risk-api
+  name: CoreLogic Australia Property Risk API
+  description: >-
+    Property risk services — the API behind Cotality's Australian hazard and resilience products.
+    Named and hosted in the environment-details guide (sandbox api-sbox.corelogic.asia/risk);
+    probed anonymously on 2026-07-26 and returned HTTP 401. No operation list is published
+    anonymously.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://risk.api.cotality.com.au
+  tags:
+  - Risk
+  - Climate Resilience
+  - Property Data
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-places-api
+  name: CoreLogic Australia Places API
+  description: >-
+    Places of interest attached to a property. The portal FAQ is explicit about its scope —
+    "Currently, only Schools and School Catchments are available" — and that NAPLAN data is not
+    available, with school detail instead pointing to the school's own website. Named and hosted in
+    the environment-details guide (sandbox api-sbox.corelogic.asia/places); probed anonymously on
+    2026-07-26 and returned HTTP 401.
+  humanURL: https://developer.corelogic.asia/faq
+  baseURL: https://places.api.cotality.com.au
+  tags:
+  - Places
+  - Schools
+  - School Catchments
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/faq
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-location-search-api
+  name: CoreLogic Australia Location Search API
+  description: >-
+    Location search services — the successor surface for resolving the locality, postcode, street,
+    council-area and state identifiers every Cotality search, statistic and chart is keyed on.
+    Named and hosted in the environment-details guide (sandbox api-sbox.corelogic.asia/location);
+    probed anonymously on 2026-07-26 and returned HTTP 401.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://location.api.cotality.com.au
+  tags:
+  - Location
+  - Geo Search
+  - Address Matching
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-property-bureau-api
+  name: CoreLogic Australia Property Bureau API
+  description: >-
+    Property Bureau service. Named and hosted in the Cotality Developer Portal environment-details
+    guide and included in the sandbox at api-sbox.corelogic.asia/propertybureau; probed anonymously
+    on 2026-07-26 and returned HTTP 401. No documentation route, operation list or schema is
+    published outside the authenticated portal.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://propertybureau.api.cotality.com.au
+  tags:
+  - Property Data
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-avm-report-api
+  name: CoreLogic Australia AVM Report API
+  description: >-
+    Report rendering for IntelliVal automated valuations — the document form of the AVM number
+    rather than the raw estimate. Named and hosted in the environment-details guide (sandbox
+    api-sbox.corelogic.asia/avm-report); probed anonymously on 2026-07-26 and returned HTTP 401.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://avm-report.api.cotality.com.au
+  tags:
+  - AVM
+  - Valuation
+  - Reports
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-property-profile-report-api
+  name: CoreLogic Australia Property Profile Report API
+  description: >-
+    Property profile report generation — the API behind Cotality's Australian property, suburb and
+    investment report products. Named and hosted in the environment-details guide (sandbox
+    api-sbox.corelogic.asia/property-profile-report); probed anonymously on 2026-07-26 and returned
+    HTTP 401.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://property-profile-report.api.cotality.com.au
+  tags:
+  - Reports
+  - Property Data
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-reporting-api
+  name: CoreLogic Australia Reporting API
+  description: >-
+    Reporting services. Named and hosted in the Cotality Developer Portal environment-details guide
+    and included in the sandbox at api-sbox.corelogic.asia/reporting; probed anonymously on
+    2026-07-26 and returned HTTP 401. No operation list is published anonymously.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://reporting.api.cotality.com.au
+  tags:
+  - Reports
+  - Analytics
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-property-monitor-api
+  name: CoreLogic Australia Property Monitor API
+  description: >-
+    Property monitoring — watch a property or portfolio for change. Named and hosted in the
+    environment-details guide, and explicitly excluded from the sandbox ("Property Monitor and
+    Notification" is on Cotality's published list of collections the sandbox does not include), so
+    it is only reachable after promotion to UAT. Probed anonymously on 2026-07-26 and returned
+    HTTP 401.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://property-monitor.api.cotality.com.au
+  tags:
+  - Monitoring
+  - Property Data
+  - Alerts
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-notification-api
+  name: CoreLogic Australia Notification API
+  description: >-
+    Notification services. Named and hosted in the environment-details guide and excluded from the
+    sandbox alongside Property Monitor; probed anonymously on 2026-07-26 and returned HTTP 401. No
+    event catalogue, delivery model or payload schema is published anonymously — the only
+    documented push surface on the estate is the PSX valuation web hook.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://notification.api.cotality.com.au
+  tags:
+  - Notifications
+  - Alerts
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+  - type: Webhooks
+    url: asyncapi/corelogic-au-psx-webhooks.yml
+- aid: corelogic-au:corelogic-au-owner-verification-api
+  name: CoreLogic Australia Owner Verification API
+  description: >-
+    Property owner verification services. Named and hosted in the environment-details guide and
+    excluded from the sandbox ("Property Owner Verification"), so it is reachable only after
+    promotion to UAT under a commercial licence. Probed anonymously on 2026-07-26 and returned
+    HTTP 401.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://verification.api.cotality.com.au
+  tags:
+  - Verification
+  - Ownership
+  - Identity
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-update-api
+  name: CoreLogic Australia Update API
+  description: >-
+    Update services — the write-shaped surface of the Cotality Australian estate. Named and hosted
+    in the environment-details guide and excluded from the sandbox ("Update"), so it is reachable
+    only after promotion to UAT. Probed anonymously on 2026-07-26 and returned HTTP 401. No
+    operation list or schema is published anonymously.
+  humanURL: https://developer.corelogic.asia/guides/environment-details
+  baseURL: https://update.api.cotality.com.au
+  tags:
+  - Data Update
+  - Property Data
+  properties:
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
+- aid: corelogic-au:corelogic-au-cordell-sum-sure-api
+  name: CoreLogic Australia Cordell Sum Sure API
+  description: >-
+    Cordell Sum Sure — building and contents rebuild-cost estimation, the calculator Australian
+    insurers and brokers use for sum-insured adequacy. Named and hosted in the environment-details
+    guide with separate Australian and New Zealand hosts, and included in the sandbox at
+    api-sbox.corelogic.asia/sumsure/au. Probed anonymously on 2026-07-26 and returned HTTP 401.
+  humanURL: https://www.cotality.com/au/products/cordell-sum-sure
+  baseURL: https://cordellsumsure-au.api.cotality.com.au
+  tags:
+  - Property Insurance
+  - Rebuild Cost
+  - Cordell
+  - Construction
+  properties:
+  - type: Documentation
+    url: https://www.cotality.com/au/products/cordell-sum-sure
+  - type: Documentation
+    url: https://developer.corelogic.asia/guides/environment-details
 common:
+- type: DomainSecurity
+  url: security/corelogic-au-domain-security.yml
 - type: Website
   url: https://www.cotality.com/au
 - type: DeveloperPortal
@@ -321,8 +580,74 @@ common:
   url: collections/corelogic-au-sample-sandbox.postman_collection.json
 - type: PostmanCollection
   url: collections/corelogic-au-rp-inside-auth-example.postman_collection.json
+- type: Postman
+  url: https://documenter.getpostman.com/view/7051651/S1EJWfxt
+- type: APIReference
+  url: https://developer.corelogic.asia/apis
+- type: Blog
+  url: https://www.cotality.com/au/insights
+- type: Documentation
+  url: https://developer.corelogic.asia/guides/environment-details
+- type: Documentation
+  url: https://developer.corelogic.asia/guides/metric-types
+- type: Documentation
+  url: https://developer.corelogic.asia/guides/enterprise-apis/property-types
+- type: Documentation
+  url: https://developer.corelogic.asia/guides/mapping-services
+- type: Authentication
+  url: authentication/corelogic-au-authentication.yml
+- type: OAuthScopes
+  url: scopes/corelogic-au-scopes.yml
+- type: WellKnown
+  url: well-known/corelogic-au-well-known.yml
+- type: Conventions
+  url: conventions/corelogic-au-conventions.yml
+- type: ErrorCatalog
+  url: errors/corelogic-au-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/corelogic-au-lifecycle.yml
+- type: Deprecation
+  url: https://developer.corelogic.asia/faq
+- type: Sandbox
+  url: sandbox/corelogic-au-sandbox.yml
+- type: RateLimits
+  url: rate-limits/corelogic-au-rate-limits.yml
+- type: DataModel
+  url: data-model/corelogic-au-data-model.yml
+- type: Conformance
+  url: conformance/corelogic-au-conformance.yml
+- type: Packages
+  url: packages/corelogic-au-packages.yml
+- type: LLMsTxt
+  url: llms/corelogic-au-llms.txt
+- type: Webhooks
+  url: asyncapi/corelogic-au-psx-webhooks.yml
+- type: VulnerabilityDisclosure
+  url: security/corelogic-au-vulnerability-disclosure.yml
+- type: Security
+  url: https://www.cotality.com/security
+- type: AgentSkill
+  url: skills/_index.yml
+- type: AgentSkill
+  name: Authenticate against the Cotality Australia APIs and make a first call
+  url: skills/corelogic-au-authenticate-and-call.md
+- type: AgentSkill
+  name: Resolve an Australian address to a CoreLogic property record
+  url: skills/corelogic-au-address-to-property-record.md
+- type: AgentSkill
+  name: Value an Australian property with IntelliVal and back it with comparables
+  url: skills/corelogic-au-value-a-property.md
+- type: AgentSkill
+  name: Pull Australian auction clearance rates and suburb market trends
+  url: skills/corelogic-au-auction-clearance-and-market-trends.md
 - type: LinkedIn
-  url: https://www.linkedin.com/company/cotality
+  url: https://www.linkedin.com/company/cotalityaustralia
+- type: Twitter
+  url: https://x.com/cotality_au
+- type: Facebook
+  url: https://www.facebook.com/cotalityau/
+- type: Instagram
+  url: https://www.instagram.com/cotality_au/
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

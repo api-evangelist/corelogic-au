@@ -1,0 +1,181 @@
+generated: '2026-07-26'
+method: searched
+source: >-
+  https://developer.corelogic.asia/guides/standards-and-conventions and
+  https://developer.corelogic.asia/faq (guide prose compiled into the portal bundle
+  main.aefa4bad.js, fetched HTTP 200 on 2026-07-26), corroborated against the 101 requests in
+  collections/corelogic-au-sample-sandbox.postman_collection.json
+docs: https://developer.corelogic.asia/guides/standards-and-conventions
+style:
+  architecture: REST
+  verbatim: >-
+    "All of our APIs are based on REST principles, using only standard verbs and status codes with
+    JSON-encoded responses. Transport is TLS encryped, and requests require an OAuth2 Authorization
+    Bearer token."
+  media_type: application/json
+  exceptions:
+  - >-
+    The Charts API returns image/png (server-rendered chart images) rather than JSON —
+    /charts/v2/chart.png and /charts/census.
+  - >-
+    A number of legacy Property Services operations carry a literal .json suffix on the path
+    (for example /au/v1/property/comparables.json, /au/v2/suggest.json).
+transport:
+  https_required: true
+  minimum_tls: TLSv1.2
+  verbatim: '"All API requests must be made over HTTPS, with TLSv1.2 minimum."'
+authentication:
+  style: OAuth 2.0 bearer JWT on every request
+  header: 'Authorization: Bearer <access_token>'
+  verbatim: '"API requests without a valid Authorization header will fail."'
+  detail: authentication/corelogic-au-authentication.yml
+http_methods:
+  documented: [GET, POST, PUT]
+  semantics:
+    GET: Make a GET request to retrieve data.
+    POST: Use a POST request to create new resources.
+    PUT: Make a PUT request to update a resource.
+  observed_in_collection: [GET, POST]
+  note: >-
+    DELETE and PATCH are not documented on the standards page and do not appear in the published
+    sandbox collection. POST is also used for read-shaped operations (comparables, live AVM,
+    statistics, census) where the query is too large for a query string.
+idempotency:
+  supported: false
+  evidence: >-
+    No idempotency key, no Idempotency-Key header, and no retry-safety contract appears anywhere in
+    the standards-and-conventions guide, the FAQ, the authentication guide or any of the 101
+    published sandbox requests. The word "idempotent" does not occur in the developer portal bundle
+    (0 occurrences across 441,070 bytes). The surface is overwhelmingly read-oriented, and the one
+    genuinely stateful product (PSX valuation ordering) documents its ordering flow in a PDF-style
+    implementation guide with no de-duplication contract.
+parameters:
+  categories: [path, query, request body]
+  verbatim: >-
+    "Our APIs use three main categories of parameters for each endpoint: path, query, request body."
+  path_example: >-
+    curl -X GET --header "Authorization: Bearer ***"
+    "https://api-sbox.corelogic.asia/property-details/au/properties/353657253/attributes/additional"
+  query_example: >-
+    curl -X GET --header "Authorization: Bearer ***"
+    "https://api-sbox.corelogic.asia/search/au/property/postcode/43434342?baths=2&pTypes=UNIT"
+pagination:
+  documented: >-
+    "Some of our APIs use query string parameters for sorting, filtering and pagination." The
+    portal does not publish a single normative pagination contract; the two generations of the
+    search surface use different parameter sets, both observable in the vendor's own collection.
+  styles:
+  - style: page-number
+    surface: Search Services (search.api.cotality.com.au)
+    params: [page, size]
+    example: /au/property/postcode/400709?beds=1-6&page=0&size=5
+    zero_indexed: true
+  - style: limit-offset
+    surface: Property Services (property-au.api.cotality.com.au, deprecated)
+    params: [limit, offset]
+    example: /au/v1/search/sales/property.json?limit=4&offset=3
+  - style: limit-only
+    surface: Suggest / Parcel Suggest
+    params: [limit]
+    example: /au/v2/suggest.json?q=vic&limit=10
+sorting:
+  styles:
+  - style: repeated field,direction pairs
+    surface: Search Services
+    param: sort
+    example: '?sort=beds,desc&sort=landArea,desc'
+    note: the sort parameter repeats, giving a multi-key sort
+  - style: field.direction
+    surface: Property Services sales search
+    param: sort
+    example: '?sort=contractdate.desc'
+  - style: split sortType / sortOrder
+    surface: Property Services /au/v1/search.json
+    params: [sortType, sortOrder]
+    example: '?sortType=bedrooms&sortOrder=desc'
+filtering:
+  range_syntax: >-
+    Numeric filters use an inclusive hyphen range with either bound optional — beds=2-4,
+    baths=2- (two or more), baths=-3 (three or fewer), price=550000-, date=20150604-20160101.
+  list_syntax: comma-separated enumerations — pTypes=HOUSE,UNIT, propertyTypes=HOUSE,LAND
+  geometry: >-
+    polygonPoints uses pipe-separated lat|lon pairs joined by commas —
+    polygonPoints=-34.91102884|138.59206763,-28.1331557|152.982871
+  sparse_fields:
+    param: returnFields
+    surface: Property Services sales search
+    example: '?returnFields=address,coordinate,avmDetailList'
+    note: >-
+      The nearest thing to a sparse-fieldset / expansion contract on the surface. Search Services
+      (the newer generation) does not expose it.
+resource_identity:
+  primary_key: >-
+    Opaque numeric CoreLogic property identifier (for example 45232760, 1092612, 47872329) — the
+    de facto Australian UPI. Resolved from free-text addresses by the Address Matcher
+    (/au/matcher/address) or the Suggest service.
+  stability: >-
+    Not permanent. The FAQ documents that saved property IDs can stop returning data because a
+    property "has been deduplicated", "has been made obsolete", or "was split or merged".
+    Integrators must re-resolve identifiers rather than treat them as forever-keys.
+  location_ids: >-
+    Separate numeric identifiers for each location type — locality, postcode, street, councilArea,
+    state — passed as locationId + locationType, or as lId + lTId on the Charts and Statistics
+    surfaces.
+versioning:
+  scheme: uri-path, per service, not estate-wide
+  observed: [/au/v1/, /au/v2/, /charts/v2/, /v1/statistics.json]
+  policy_verbatim: >-
+    "As we continue to develop and improve Cotality APIs, service method request and response
+    objects will evolve over time. As such, we strive to ensure that new functionality is backwards
+    compatible. However, if a change to existing input or output objects is required (i.e. breaking
+    changes), we will introduce a new version of the service, allowing the integration of older
+    versions to still be supported for a reasonable length of time before removal. We will attempt
+    to notify you in advance of any updates to our Cotality APIs prior to release."
+  detail: lifecycle/corelogic-au-lifecycle.yml
+error_envelope:
+  shape: >-
+    Non-RFC-9457. The gateway returns a messages[] envelope —
+    {"messages":[{"type":"ERROR","message":"Access token is missing"}]} — observed live on every
+    *.api.cotality.com.au host on 2026-07-26. The legacy Apigee host returns an Apigee fault
+    envelope instead: {"fault":{"faultstring":"...","detail":{"errorcode":"..."}}}. The OAuth token
+    service returns the RFC 6749 shape: {"error":"unauthorized","error_description":"..."}.
+  detail: errors/corelogic-au-problem-types.yml
+rate_limit_signalling:
+  documented: >-
+    "429 Too Many Requests — Sandbox quota or rate limit has been exceeded, retry with backoff."
+  headers_published: none
+  detail: rate-limits/corelogic-au-rate-limits.yml
+request_tracing:
+  request_id_header: none documented
+  note: >-
+    No correlation-id or request-id convention appears in the standards guide or in any published
+    sample request. Support triage is by email (api.support@corelogic.com), not by request id.
+health_checks:
+  pattern: /env/health
+  note: >-
+    Every service family in the vendor's published collection carries a GET {service}/env/health
+    probe — Access, AVM, Auction, Charts, Property Details, Property Services (/au/env/health),
+    Property Timeline, Search, Statistics. This is the closest thing to a status surface the
+    Australian estate publishes.
+  detail: lifecycle/corelogic-au-lifecycle.yml
+regionalisation:
+  pattern: >-
+    Country is a path segment immediately after the service root — /au/... for Australia,
+    /nz/... for New Zealand — and New Zealand-specific services (building consents, titles) live on
+    .cotality.co.nz hosts rather than .cotality.com.au.
+content_obligations:
+  disclaimers: >-
+    Licensees must display Cotality legal disclaimers alongside the data. They are served by the
+    Content API by key (for example /legal/disclaimers/auction_au). The FAQ notes legal content is
+    NOT available in the sandbox environment — it becomes available on promotion to UAT.
+  images: >-
+    Property images are passed through from suppliers without modification and may be WebP, JPG,
+    JPEG, PNG, TIFF, GIF or RAW; the FAQ explicitly warns the list is not exhaustive and recommends
+    supporting WebP.
+cross_links:
+  authentication: authentication/corelogic-au-authentication.yml
+  scopes: scopes/corelogic-au-scopes.yml
+  errors: errors/corelogic-au-problem-types.yml
+  lifecycle: lifecycle/corelogic-au-lifecycle.yml
+  sandbox: sandbox/corelogic-au-sandbox.yml
+  rate_limits: rate-limits/corelogic-au-rate-limits.yml

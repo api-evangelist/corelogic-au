@@ -1,0 +1,46 @@
+generated: '2026-07-26'
+method: searched
+source: >-
+  https://developer.corelogic.asia/guides/standards-and-conventions,
+  https://developer.corelogic.asia/guides/environment-details,
+  https://developer.corelogic.asia/faq
+docs: https://developer.corelogic.asia/guides/standards-and-conventions
+summary: >-
+  Rate limiting is documented but never quantified. Cotality publishes that the sandbox carries an
+  "API request quota" and that exhausting it returns 429, but no number, window, header or
+  Retry-After contract appears anywhere on the anonymous surface. Production limits are a matter
+  for the negotiated commercial data licence and are not published.
+signalling:
+  status_code: 429
+  verbatim: >-
+    "429 Too Many Requests — Sandbox quota or rate limit has been exceeded, retry with backoff."
+  retry_guidance: retry with backoff
+  retry_after_header: not documented
+  rate_limit_headers: not documented
+rate_limits:
+- environment: sandbox
+  scope: per sandbox client
+  limit_count: null
+  window: null
+  quantified: false
+  enforcement: 429 Too Many Requests when the quota is exhausted
+  verbatim: >-
+    "This is one of the Cotality API environments where APIs provide a limited dataset, and is
+    limited by request quota. When the sandbox quota is exhausted, the response will be '429 Too
+    Many Requests'."
+- environment: uat
+  scope: per provisioned client
+  limit_count: null
+  quantified: false
+  note: >-
+    Described only as "unrestricted access to UAT or Production API environments" once a paid
+    service plan is provisioned; no limits published.
+- environment: production
+  scope: per commercial licence
+  limit_count: null
+  quantified: false
+  note: Governed by the signed Cotality data licence; not published.
+cross_links:
+  conventions: conventions/corelogic-au-conventions.yml
+  errors: errors/corelogic-au-problem-types.yml
+  sandbox: sandbox/corelogic-au-sandbox.yml

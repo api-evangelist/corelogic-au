@@ -1,0 +1,47 @@
+generated: '2026-07-26'
+method: generated
+grounding: >-
+  No OpenAPI is retrievable anonymously from the Cotality Developer Portal, so every operation
+  referenced by these skills is grounded in a real HTTP method + path from Cotality's own published
+  "1. CoreLogic APIs AU Sample Sandbox Collection"
+  (collections/corelogic-au-sample-sandbox.postman_collection.json, 101 requests) or from the
+  portal's published guides. No operation, parameter or host below is invented.
+skills:
+- file: corelogic-au-authenticate-and-call.md
+  name: Authenticate against the Cotality Australia APIs and make a first call
+  api: CoreLogic Australia Access API
+  operations:
+  - GET /access/oauth/token?grant_type=client_credentials
+  - POST /as/token.oauth2
+  - POST /oauth/token
+  - GET /env/health
+- file: corelogic-au-address-to-property-record.md
+  name: Resolve an Australian address to a CoreLogic property record
+  api: CoreLogic Australia Search API + Property Details API
+  operations:
+  - GET /au/matcher/address
+  - GET /au/v2/suggest.json
+  - GET /au/properties/{propertyId}/attributes/core
+  - GET /au/properties/{propertyId}/sales
+  - GET /au/properties/{propertyId}/otm/campaign/sales
+  - GET /au/properties/{propertyId}/images/
+  - GET /au/properties/{propertyId}/timeline
+- file: corelogic-au-value-a-property.md
+  name: Value an Australian property with IntelliVal and back it with comparables
+  api: CoreLogic Australia AVM API + Property Services API
+  operations:
+  - GET /au/properties/{propertyId}/avm/intellival/consumer/current
+  - GET /au/properties/{propertyId}/avm/intellival/origination/{valuationDate}
+  - POST /au/properties/{propertyId}/liveavm/intellival/consumer
+  - POST /au/properties/{propertyId}/liveavm/intellival/consumer/band
+  - POST /au/v1/property/comparables.json
+- file: corelogic-au-auction-clearance-and-market-trends.md
+  name: Pull Australian auction clearance rates and suburb market trends
+  api: CoreLogic Australia Auction API + Statistics API + Charts API
+  operations:
+  - GET /au/results/state/{state}
+  - GET /au/details/state/{state}/postcode/{postcode}/suburb/{suburb}
+  - POST /v1/statistics.json
+  - GET /census/summary
+  - GET /v2/chart.png
+  - GET /legal/disclaimers/{key}

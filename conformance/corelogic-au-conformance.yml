@@ -1,0 +1,136 @@
+generated: '2026-07-26'
+method: searched
+source: >-
+  https://auth.corelogic.asia/.well-known/openid-configuration,
+  https://developer.corelogic.asia/guides/standards-and-conventions,
+  https://developer.corelogic.asia/guides/api-authentication, review.yml RESO investigation,
+  live probes 2026-07-26
+standards:
+- id: oauth2
+  conforms: true
+  evidence: >-
+    "Our APIs use the OAuth 2.0 protocol..." — client_credentials, authorization_code and
+    refresh_token grants documented; production token endpoints at
+    access.api.cotality.com.au/as/token.oauth2 and /oauth/token with HTTP Basic client auth.
+- id: rfc6749-oauth2-core
+  conforms: true
+  evidence: >-
+    Token service returns the RFC 6749 error shape {"error":"unauthorized",
+    "error_description":"..."} — observed live 2026-07-26.
+- id: oidc-core
+  conforms: true
+  evidence: >-
+    PingFederate OpenID Provider at https://auth.corelogic.asia with issuer, authorization, token,
+    userinfo and jwks endpoints — used for developer-portal login, not for data-API access.
+- id: rfc8414-authorization-server-metadata
+  conforms: true
+  evidence: >-
+    https://auth.corelogic.asia/.well-known/oauth-authorization-server returns 200 with 40 metadata
+    keys (harvested to well-known/corelogic-au-oauth-authorization-server.json).
+- id: oidc-discovery
+  conforms: true
+  evidence: >-
+    https://auth.corelogic.asia/.well-known/openid-configuration returns 200, 5,611 bytes
+    (harvested to well-known/corelogic-au-openid-configuration.json).
+- id: rfc7636-pkce
+  conforms: true
+  evidence: 'code_challenge_methods_supported: ["plain","S256"] in the OIDC discovery document.'
+  caveat: >-
+    Advertised by the portal identity provider. The data APIs use client_credentials, where PKCE
+    does not apply.
+- id: rfc7519-jwt
+  conforms: true
+  evidence: >-
+    "The Access Token response is a JSON Web Token (JWT) and may be decoded to obtain expiry time
+    (a Unix epoch timestamp)."
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: >-
+    No /.well-known/security.txt on cotality.com, corelogic.asia, api.corelogic.asia or
+    auth.corelogic.asia (all 404 on 2026-07-26). The developer portal's 200 is an SPA shell.
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: >-
+    Errors use a proprietary {"messages":[{"type":"ERROR","message":"..."}]} envelope, an Apigee
+    fault envelope, or the OAuth error shape — no application/problem+json anywhere.
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: >-
+    Deprecated services are marked in a documentation table only; no Sunset or Deprecation header
+    is documented or observable.
+- id: openapi
+  conforms: partial
+  evidence: >-
+    The Cotality Developer Portal renders OpenAPI definitions in an authenticated Swagger UI widget
+    — the documents exist but the Backstage catalogue API returns 401 to every anonymous request,
+    so no OpenAPI can be retrieved without a portal account. "swagger" appears 0 times in the
+    public bundle; OpenAPI is the portal's only contract format.
+- id: asyncapi
+  conforms: false
+  evidence: >-
+    No AsyncAPI, no WebSocket, no SSE and no broker surface. PSX offers subscribe-then-poll pull
+    notifications and, for licensed customers, push notifications to a customer-supplied web hook
+    URL configured in the order request or against the customer profile — but no event catalogue
+    or schema is published anonymously.
+- id: reso-web-api
+  conforms: false
+  evidence: >-
+    0 occurrences of "RESO" in the 441,070-byte portal bundle; no OData service root, no $metadata
+    (api.corelogic.asia/$metadata returns 404), no RESO resource names in any of the 101 published
+    sandbox requests. CoreLogic's RESO certifications attach to Trestle, its United States MLS
+    platform, not to this Australian surface — see review.yml.
+- id: reso-data-dictionary
+  conforms: false
+  evidence: >-
+    Cotality uses its own opaque numeric CoreLogic property identifier as the primary key, not a
+    RESO Universal Property Identifier.
+- id: odata
+  conforms: false
+  evidence: >-
+    0 occurrences of "OData" or "$metadata" in the portal bundle; no $filter/$select/$expand query
+    syntax in any published request.
+- id: json-api
+  conforms: false
+  evidence: Plain JSON documents; no JSON:API media type, top-level data/errors envelope or links.
+- id: graphql
+  conforms: false
+  evidence: No /graphql surface on any host; every documented operation is REST/JSON.
+- id: mcp
+  conforms: partial
+  evidence: >-
+    The parent company launched a Cotality MCP Server on 2026-03-31, but its four published data
+    assets are United States datasets (CLIP, Cotality HPI, US Property Characteristics, Climate
+    Risk Analytics) and no Australian data asset or endpoint is published. See
+    mcp/corelogic-au-mcp.yml.
+- id: tls12-minimum
+  conforms: true
+  evidence: >-
+    "All API requests must be made over HTTPS, with TLSv1.2 minimum." Live probes measured TLSv1.3
+    on www.cotality.com, developer.corelogic.asia and access.api.cotality.com.au.
+- id: hsts
+  conforms: partial
+  evidence: >-
+    developer.corelogic.asia sets HSTS (max-age 15552000); www.cotality.com does not; the
+    production API hosts return no HSTS header. See security/corelogic-au-domain-security.yml.
+- id: dnssec
+  conforms: false
+  evidence: Neither cotality.com nor corelogic.asia is DNSSEC-signed.
+- id: dmarc
+  conforms: true
+  evidence: Both cotality.com and corelogic.asia publish SPF and DMARC with policy p=reject.
+- id: caa
+  conforms: false
+  evidence: No CAA records on cotality.com or corelogic.asia.
+regulatory_context:
+  jurisdiction: Australia
+  named_in_sandbox_agreement:
+  - Privacy Act 1988 (Cth)
+  - Australian Privacy Principles
+  - Spam Act 2003 (Cth)
+  - Do Not Call Register Act 2006 (Cth)
+  note: >-
+    These are contractual obligations Cotality imposes on sandbox users, not certifications
+    Cotality publishes about itself. No SOC 2, ISO 27001, PCI DSS, IRAP or Australian Government
+    security assessment is published on the anonymous Australian surface, and no trust centre
+    exists — see security/corelogic-au-trust-center.yml.
+compliance_program_published: false

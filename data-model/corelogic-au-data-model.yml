@@ -1,0 +1,204 @@
+generated: '2026-07-26'
+method: derived
+source: >-
+  collections/corelogic-au-sample-sandbox.postman_collection.json (101 vendor-published requests),
+  collections/corelogic-au-rp-inside-auth-example.postman_collection.json,
+  https://developer.corelogic.asia/guides/standards-and-conventions,
+  https://developer.corelogic.asia/guides/enterprise-apis/property-types,
+  https://developer.corelogic.asia/guides/metric-types
+note: >-
+  Derived from the resource paths and identifier usage in Cotality's own published collections and
+  guides — NOT from an OpenAPI document, because none is retrievable anonymously. Field-level
+  schemas are therefore not asserted; only entities, their identifiers, and the relationships the
+  URL structure makes explicit.
+root_entity: Property
+identifier_model:
+  primary: >-
+    Opaque numeric CoreLogic property identifier (propertyId). The de facto Australian universal
+    property identifier, and the join key across every service family. NOT a RESO UPI.
+  resolution:
+  - service: Address Matcher
+    path: /au/matcher/address?q=<free text>&matchProfileId=<n>&clientName=<name>
+    host: search.api.cotality.com.au
+  - service: Suggest
+    path: /au/v2/suggest.json?q=<prefix>&suggestionTypes=address,street,locality,postcode
+    host: property-au.api.cotality.com.au (deprecated)
+  - service: Parcel Suggest
+    path: /parcel/suggest.json?q=<plan/lot>
+  volatility: >-
+    Identifiers churn — the FAQ documents deduplication, obsoleting, and split/merge as reasons a
+    saved id stops resolving.
+  location_identifiers:
+    types: [locality, postcode, street, councilArea, state]
+    forms:
+    - locationId + locationType (Property Services /au/v1/search.json)
+    - path segment (Search Services /au/property/locality/{id})
+    - lId + lTId (Charts and Statistics series parameters)
+entities:
+- name: Property
+  key: propertyId
+  description: A single Australian property record — the spine of the whole estate.
+  example_ids: [45232760, 1092612, 47872329, 17717000, 46822049]
+- name: PropertyAttributesCore
+  key: propertyId
+  path: /au/properties/{propertyId}/attributes/core
+  description: Core structural attributes — beds, baths, car spaces, land area, property type.
+- name: PropertyAttributesAdditional
+  key: propertyId
+  path: /au/properties/{propertyId}/attributes/additional
+  description: Extended attribute set beyond the core record.
+- name: PropertySite
+  key: propertyId
+  path: /au/properties/{propertyId}/site
+  description: Site/parcel detail for the property.
+- name: PropertyFeatures
+  key: propertyId
+  path: /au/properties/{propertyId}/features
+  description: Discrete feature flags (pool, garage, and similar).
+- name: PropertyOccupancy
+  key: propertyId
+  path: /au/properties/{propertyId}/occupancy
+  description: Owner-occupied / rented / vacant status.
+- name: PropertyContact
+  key: propertyId
+  path: /au/properties/{propertyId}/contacts
+  alt_path: /au/v1/property-marketing-contact.json
+  description: Marketing contacts associated with the property.
+- name: PropertyImage
+  key: propertyId
+  path: /au/properties/{propertyId}/images/ and /images/default
+  description: >-
+    Property photographs, passed through from suppliers unmodified — WebP, JPG, JPEG, PNG, TIFF,
+    GIF or RAW.
+- name: Sale
+  key: propertyId + sale event
+  path: /au/properties/{propertyId}/sales
+  description: Historical transfer/sale events for the property.
+- name: LastSale
+  key: propertyId
+  path: /au/properties/{propertyId}/sales/last
+  description: The most recent sale, also exposed as a search flavour (/lastSale).
+- name: SalesCampaign
+  key: propertyId
+  path: /au/properties/{propertyId}/otm/campaign/sales
+  description: On-the-market for-sale marketing campaign.
+- name: RentalCampaign
+  key: propertyId
+  path: /au/properties/{propertyId}/otm/campaign/rent
+  description: On-the-market for-rent marketing campaign.
+- name: Advertisement
+  key: advertisementId
+  path: >-
+    /au/v1/property/{propertyId}/for-sale-advertisement/{advertisementId}.json and
+    /for-rent-advertisement/{advertisementId}.json
+  description: An individual listing advertisement within a campaign, with optional description text.
+- name: TimelineEvent
+  key: propertyId
+  path: /au/properties/{propertyId}/timeline
+  description: >-
+    Chronological event stream — sales, listing campaigns, rental campaigns and, with
+    ?withBuildingConsents, building consent events.
+- name: AVMValuation
+  key: propertyId + variant + valuationDate
+  paths:
+  - /au/properties/{propertyId}/avm/intellival/consumer/current
+  - /au/properties/{propertyId}/avm/intellival/consumer/{date}
+  - /au/properties/{propertyId}/avm/intellival/origination
+  - /au/properties/{propertyId}/avm/intellival/origination/{date}
+  - /au/properties/{propertyId}/liveavm/intellival/consumer
+  - /au/properties/{propertyId}/liveavm/intellival/consumer/band
+  variants: [consumer, origination]
+  description: >-
+    IntelliVal automated valuation. Static (point-in-time, current or historical) and Live (POST,
+    recomputed) forms; the band variant returns a value range. roundTo controls rounding.
+- name: Comparable
+  key: propertyId (target) -> propertyId[] (comparables)
+  path: /au/v1/property/comparables.json
+  method: POST
+  rules: [RP Data Generic Rules, RP Data Sales Rule, RP Data Listings For Sale Rule, RP Data Listings For Rent Rule]
+  description: Rule-driven comparable-property selection around a target property.
+- name: ProsAndCons
+  key: propertyId
+  path: /au/property/{propertyId}/pros-cons
+  description: Qualitative property assessment.
+- name: Validation
+  key: propertyId
+  path: /au/property/{propertyId}/validation
+  description: Property record validation.
+- name: Location
+  key: locationId + locationTypeId
+  subtypes: [state, councilArea, locality, postcode, street]
+  description: >-
+    The geographic hierarchy every search, statistic and chart is keyed on. Australian states
+    observed as two-letter codes (qld, nsw, vic, sa, wa, tas, nt, act).
+- name: AuctionResult
+  key: state + week
+  paths:
+  - /au/results/state/{state}
+  - /au/results/state/{state}/weeks/{n}
+  - /au/results/state/{state}/search?fromDate=&toDate=
+  - /au/results/state/{state}/compare/years/{n}
+  - /au/details/state/{state}/postcode/{postcode}/suburb/{suburb}
+  - /au/summaries/state/{state}
+  description: >-
+    Weekly auction results and clearance-rate statistics, filterable to capital cities
+    (capitalCityOnly=true) and to a stats view (stats=clearance-rate).
+- name: MarketStatistic
+  key: locationId + locationTypeId + metricTypeId
+  paths: [/v1/statistics.json, /census, /census/summary]
+  description: Suburb/locality/region market metrics and ABS census summaries.
+- name: MetricType
+  key: metricTypeId (mTId) / metricTypeGroupId
+  docs: https://developer.corelogic.asia/guides/metric-types
+  description: The vocabulary of market-trends and census measures.
+- name: PropertyType
+  key: pTypeId (pTId)
+  docs: https://developer.corelogic.asia/guides/enterprise-apis/property-types
+  values_observed: [HOUSE, UNIT, LAND, RESIDENTIAL]
+  description: Major and minor Cotality property-type taxonomies.
+- name: Chart
+  key: series parameters (s1..sN of lId/lTId/pTId/mTId)
+  paths: [/charts/v2/chart.png, /charts/census]
+  description: Server-rendered PNG of one or more market-trend or census series.
+- name: Disclaimer
+  key: disclaimer key
+  path: /legal/disclaimers/{key}
+  examples: [auction_au, auction_standalone_au]
+  description: Legal notices licensees are contractually required to display alongside the data.
+- name: ValuationOrder
+  key: order id
+  service: PSX
+  operations: [psx-expanded-search, psx-panel-lookup, psx-subscribe, psx-get-order, psx-update-order, psx-cancel, psx-attach-or-retrieve-documents, psx-set-retrieved, psx-pull-notifications]
+  description: >-
+    A valuation job on the PSX exchange, moving through the documented valuation workflow states
+    with fixed-fee or competitive-quote pricing and pull or push notifications.
+relationships:
+- {from: Property, to: PropertyAttributesCore, type: has_one, via: propertyId}
+- {from: Property, to: PropertyAttributesAdditional, type: has_one, via: propertyId}
+- {from: Property, to: PropertySite, type: has_one, via: propertyId}
+- {from: Property, to: PropertyFeatures, type: has_one, via: propertyId}
+- {from: Property, to: PropertyOccupancy, type: has_one, via: propertyId}
+- {from: Property, to: PropertyContact, type: has_many, via: propertyId}
+- {from: Property, to: PropertyImage, type: has_many, via: propertyId}
+- {from: Property, to: Sale, type: has_many, via: propertyId}
+- {from: Property, to: LastSale, type: has_one, via: propertyId}
+- {from: Property, to: SalesCampaign, type: has_many, via: propertyId}
+- {from: Property, to: RentalCampaign, type: has_many, via: propertyId}
+- {from: SalesCampaign, to: Advertisement, type: has_many, via: advertisementId}
+- {from: RentalCampaign, to: Advertisement, type: has_many, via: advertisementId}
+- {from: Property, to: TimelineEvent, type: has_many, via: propertyId}
+- {from: Property, to: AVMValuation, type: has_many, via: propertyId + valuationDate}
+- {from: Property, to: Comparable, type: has_many, via: propertyId}
+- {from: Property, to: ProsAndCons, type: has_one, via: propertyId}
+- {from: Property, to: Validation, type: has_one, via: propertyId}
+- {from: Property, to: Location, type: belongs_to, via: locality/postcode/street/councilArea ids}
+- {from: Location, to: Property, type: has_many, via: locationId}
+- {from: Location, to: MarketStatistic, type: has_many, via: locationId + metricTypeId}
+- {from: Location, to: AuctionResult, type: has_many, via: state/postcode/suburb}
+- {from: Location, to: Chart, type: has_many, via: 'sN.lId + sN.lTId'}
+- {from: MarketStatistic, to: MetricType, type: belongs_to, via: metricTypeId}
+- {from: Chart, to: MetricType, type: belongs_to, via: 'sN.mTId / metricTypeGroupId'}
+- {from: Property, to: PropertyType, type: belongs_to, via: pTypeId}
+- {from: ValuationOrder, to: Property, type: belongs_to, via: subject property address}
+- {from: AuctionResult, to: Property, type: has_many, via: auctioned properties}
+render: none

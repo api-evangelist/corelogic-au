@@ -1,0 +1,177 @@
+generated: '2026-07-26'
+method: searched
+source: >-
+  https://developer.corelogic.asia/guides/sandbox-test-data,
+  https://developer.corelogic.asia/guides/environment-details,
+  https://developer.corelogic.asia/guides/quick-start, https://developer.corelogic.asia/faq
+  (all compiled into the portal bundle main.aefa4bad.js, HTTP 200 2026-07-26)
+docs: https://developer.corelogic.asia/guides/sandbox-test-data
+summary: >-
+  Cotality runs a genuinely self-serve sandbox for the Australian and New Zealand APIs — sign up on
+  the developer portal, create a sandbox client at /apps/create, and call api-sbox.corelogic.asia
+  with a client_credentials JWT. The environment is a real mirror of production, deliberately
+  restricted: about 29,000 properties across 29 suburbs, three years of market trends, no legal
+  content, and a request quota that returns 429 when exhausted. Everything below is published by
+  the vendor verbatim; no test value here is invented.
+access:
+  self_serve: true
+  signup: https://developer.corelogic.asia/signup
+  create_client: https://developer.corelogic.asia/apps/create
+  clients_page: https://developer.corelogic.asia/apps
+  agreement: >-
+    Click-through "Sandbox Environment Terms and Conditions" — a Licence Enabler pre-agreement
+    covering confidentiality, IP, liability and Australian Privacy Act 1988 (Cth) / Australian
+    Privacy Principles / Spam Act 2003 (Cth) / Do Not Call Register Act 2006 (Cth) obligations.
+  verbatim: >-
+    "Sandbox clients are limited to the sandbox environment with a restricted dataset and API
+    request quota. Use these clients to develop your ideas and explore our APIs. This allows you to
+    get a feel for our API experience before you progress to a test environment."
+  secret_rotation: portal "Reset Client Secret" action
+  client_removal: portal "Remove Client" action
+  next_step: >-
+    "An integration representative will contact you shortly to discuss pricing and provisioning a
+    full-access, paid service plan."
+separation:
+  model: environment-scoped hosts and environment-bound tokens (no test/live key prefixes)
+  sandbox_host: https://api-sbox.corelogic.asia
+  uat_host_pattern: https://<service>.api-uat.cotality.com.au
+  production_host_pattern: https://<service>.api.cotality.com.au
+  token_endpoint_sandbox: https://api-sbox.corelogic.asia/access/as/token.oauth2
+  cross_environment_error: >-
+    401 "Invalid token provided." — a token generated in UAT can only be used in UAT.
+  restricted_access_error: 401 "Restricted environment access denied."
+quota:
+  documented: true
+  numeric_limit_published: false
+  exhausted_response: 429 Too Many Requests
+  verbatim: >-
+    "This provides access to our Sandbox environment - a limited dataset and an API request quota.
+    When the sandbox quota is exhausted the response will be '429 Too Many Requests'."
+data_limits:
+  properties_verbatim: >-
+    "Our sandbox includes property-related data for a limited subset of properties. These properties
+    are distributed across 29 suburbs (3 suburbs per state in Australia and 5 suburbs for New
+    Zealand) with about 1,000 properties in each suburb."
+  market_trends_verbatim: >-
+    "Our sandbox also includes limited market trends data. This data includes geographic location
+    types, including suburb, postcode, local government area and territory authority (in NZ). This
+    data is limited to the past three years for the suburb, postcode, local government area and
+    territory authority and one year for state and country. This data is sourced from the same 29
+    suburbs used for property-related data."
+  legal_content: >-
+    Not available in sandbox — "Legal content is not available in the Sandbox environment. Once
+    promoted to UAT you will be able to trial it."
+excluded_api_collections:
+- AVM - origination type
+- Geospatial Services
+- Property Monitor and Notification
+- Property Owner Verification
+- Update
+excluded_note: >-
+  "Our sandbox mirrors the APIs found on our UAT and production servers. However, our sandbox does
+  not include the following API collections... You will be able to access these Services when we
+  promote you to the UAT environment."
+test_properties:
+- address: 2 Albert Avenue Broadbeach QLD 4218
+  property_id: 47872329
+  country: AU
+- address: 2/10 Albert Avenue Broadbeach QLD 4218
+  property_id: 41418296
+  country: AU
+- address: 112A Bacchus Circuit Kambah ACT 2902
+  property_id: 17717000
+  country: AU
+- address: 407/8 Airedale Street Auckland Central Auckland - City
+  property_id: 17660220
+  country: NZ
+- address: 18 Avon Street Parnell Auckland - City
+  property_id: 15864070
+  country: NZ
+- address: 4 Albert Street Island Bay Wellington City
+  property_id: 9129284
+  country: NZ
+test_suburbs:
+  AU:
+    ACT:
+    - {suburb: Kambah, postcode: '2902'}
+    - {suburb: Monash, postcode: '2904'}
+    - {suburb: Oxley, postcode: '2903'}
+    NSW:
+    - {suburb: Blacktown, postcode: '2148'}
+    - {suburb: Quakers Hill, postcode: '2763'}
+    - {suburb: Seven Hills, postcode: '2147'}
+    NT:
+    - {suburb: Durack, postcode: '0830'}
+    - {suburb: Humpty Doo, postcode: '0836'}
+    - {suburb: Zuccoli, postcode: '0832'}
+    QLD:
+    - {suburb: Broadbeach, postcode: '4218'}
+    - {suburb: Southport, postcode: '4215'}
+    - {suburb: Surfers Paradise, postcode: '4217'}
+    SA:
+    - {suburb: Adelaide, postcode: '5000'}
+    - {suburb: Glenside, postcode: '5065'}
+    - {suburb: North Adelaide, postcode: '5006'}
+    TAS:
+    - {suburb: Devonport, postcode: '7310'}
+    - {suburb: La Trobe, postcode: '7307'}
+    - {suburb: Ulverstone, postcode: '7315'}
+    VIC:
+    - {suburb: Beaconsfield, postcode: '3807'}
+    - {suburb: Officer, postcode: '3809'}
+    - {suburb: Pakenham, postcode: '3810'}
+    WA:
+    - {suburb: Baldivis, postcode: '6171'}
+    - {suburb: Cooloongup, postcode: '6168'}
+    - {suburb: Rockingham, postcode: '6168'}
+  NZ:
+  - {suburb: Auckland Central, postcode: '1010'}
+  - {suburb: Parnell, postcode: '1052'}
+  - {suburb: Ponsonby, postcode: '1011'}
+  - {suburb: Island Bay, postcode: '6023'}
+  - {suburb: Saint Kilda, postcode: '9012'}
+sandbox_service_roots:
+- {service: Access Authentication Service, url: 'https://api-sbox.corelogic.asia/access'}
+- {service: Commercial API, url: 'https://api-sbox.corelogic.asia/commercial-api'}
+- {service: Construction API, url: 'https://api-sbox.corelogic.asia/construction-api'}
+- {service: Cordell Sum Sure (AU), url: 'https://api-sbox.corelogic.asia/sumsure/au'}
+- {service: Cordell Sum Sure (NZ), url: 'https://api-sbox.corelogic.asia/sumsure/nz'}
+- {service: Insurance API, url: 'https://api-sbox.corelogic.asia/insurance'}
+- {service: Auction API, url: 'https://api-sbox.corelogic.asia/auction'}
+- {service: Market Trends Charts, url: 'https://api-sbox.corelogic.asia/charts'}
+- {service: Market Trends Statistics, url: 'https://api-sbox.corelogic.asia/statistics'}
+- {service: Market Trends Census, url: 'https://api-sbox.corelogic.asia/census'}
+- {service: Location Search Services, url: 'https://api-sbox.corelogic.asia/location'}
+- {service: IntelliVal AVM Services, url: 'https://api-sbox.corelogic.asia/avm'}
+- {service: AVM Report Services, url: 'https://api-sbox.corelogic.asia/avm-report'}
+- {service: Places API, url: 'https://api-sbox.corelogic.asia/places'}
+- {service: Property Bureau API, url: 'https://api-sbox.corelogic.asia/propertybureau'}
+- {service: Property Details Services, url: 'https://api-sbox.corelogic.asia/property-details'}
+- {service: Property Services AU (deprecated), url: 'https://api-sbox.corelogic.asia/property/au'}
+- {service: Property Services NZ (deprecated), url: 'https://api-sbox.corelogic.asia/property/nz'}
+- {service: Property Timeline Services, url: 'https://api-sbox.corelogic.asia/property-timeline'}
+- {service: Property Profile Report Services, url: 'https://api-sbox.corelogic.asia/property-profile-report'}
+- {service: Reporting Services, url: 'https://api-sbox.corelogic.asia/reporting'}
+- {service: Property Risks, url: 'https://api-sbox.corelogic.asia/risk'}
+- {service: Search Services, url: 'https://api-sbox.corelogic.asia/search'}
+- {service: NZ Building Consent Services, url: 'https://api-sbox.corelogic.asia/building-consent'}
+- {service: NZ Suggest Title and Owner Services, url: 'https://api-sbox.corelogic.asia/suggest'}
+- {service: NZ Title Details Services, url: 'https://api-sbox.corelogic.asia/titles'}
+- {service: Content Services, url: 'https://api-sbox.corelogic.asia/content'}
+worked_example:
+  quickstart: https://developer.corelogic.asia/guides/quick-start
+  curl: >-
+    curl -X GET --header "Authorization: Bearer ***"
+    "https://api-sbox.corelogic.asia/property-details/au/properties/353657253/attributes/additional"
+  note: >-
+    353657253 is the property id used in Cotality's own standards-and-conventions worked example;
+    it is not in the published sandbox test-data list, so prefer an id from test_properties above.
+gotchas:
+- >-
+  Suggest returns "402: No data found for your search." against the reduced sandbox dataset, and
+  uses starts-with matching with no fuzzy fallback.
+- >-
+  The published "1. CoreLogic APIs AU Sample Sandbox Collection" leaves its host variables
+  ({{avm}}, {{search}}, {{auction}}, {{charts}}, {{statistics}}, {{content}}, {{prop-details}},
+  {{prop}}, {{propau}}, {{timeline}}) unresolved; set them to the api-sbox.corelogic.asia service
+  roots listed above before running it.

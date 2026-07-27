@@ -1,0 +1,119 @@
+generated: '2026-07-26'
+method: searched
+source: >-
+  https://developer.corelogic.asia/guides/standards-and-conventions (HTTP response status codes
+  table) and https://developer.corelogic.asia/faq (named error messages), plus anonymous live
+  probes of every production host on 2026-07-26
+docs: https://developer.corelogic.asia/guides/standards-and-conventions
+format: proprietary
+rfc9457: false
+note: >-
+  CoreLogic Australia does not use RFC 9457 / RFC 7807 problem+json. Errors come back in one of
+  three envelopes depending on which layer answers: the Cotality API gateway messages[] envelope,
+  an Apigee fault envelope on the legacy api.corelogic.asia host, or the RFC 6749 OAuth error
+  shape from the token service. There is no error type registry, no error code namespace and no
+  machine-readable error catalogue published; the status-code table below is the whole published
+  contract, enriched with the named error strings the FAQ documents.
+envelopes:
+- name: cotality-messages
+  hosts: '*.api.cotality.com.au'
+  content_type: application/json
+  shape: '{"messages":[{"type":"ERROR","message":"<text>"}]}'
+  example_observed: '{"messages":[{"type":"ERROR","message":"Access token is missing"}]}'
+  observed: '2026-07-26 — returned by every production host probed anonymously'
+- name: apigee-fault
+  hosts: api.corelogic.asia
+  content_type: application/json
+  shape: '{"fault":{"faultstring":"<text>","detail":{"errorcode":"<code>"}}}'
+  example_observed: >-
+    {"fault":{"faultstring":"Unable to identify proxy for host: star.corelogic.asia and url: /",
+    "detail":{"errorcode":"messaging.adaptors.http.flow.ApplicationNotFound"}}}
+- name: oauth2-error
+  hosts: access.api.cotality.com.au, api.corelogic.asia/access
+  content_type: application/json
+  shape: '{"error":"<code>","error_description":"<text>"}'
+  example_observed: >-
+    {"error":"unauthorized","error_description":"There is no client authentication..."}
+problems:
+- status: 200
+  title: OK
+  description: The request has succeeded.
+  source: standards-and-conventions
+- status: 401
+  title: Unauthorized
+  description: The request is unauthenticated.
+  source: standards-and-conventions
+  known_messages:
+  - message: Access token is missing
+    envelope: cotality-messages
+    meaning: No Authorization header was supplied, or the bearer token was not parseable.
+    remediation: >-
+      Obtain a client_credentials JWT from the Access API and send it as
+      "Authorization: Bearer <token>" on every request.
+    observed: 'live probe 2026-07-26 on all *.api.cotality.com.au hosts'
+  - message: Restricted environment access denied.
+    envelope: cotality-messages
+    meaning: >-
+      Documented in the portal FAQ — "your free evaluation access is restricted to our Sandbox
+      environment. You will be granted full access to all environments when a paid service plan is
+      provisioned."
+    remediation: >-
+      Call the sandbox host (api-sbox.corelogic.asia) with the sandbox client, or complete a
+      commercial licence to be promoted to UAT/production.
+  - message: Invalid token provided.
+    envelope: cotality-messages
+    meaning: >-
+      Documented in the portal FAQ — tokens are environment-bound: "check that you have generated
+      the token using the same environment as the request you are making e.g. token generated in
+      UAT can only be used to make subsequent calls in UAT."
+    remediation: Mint the token from the same environment you are calling.
+- status: 402
+  title: No data found for your search
+  description: >-
+    Documented in the FAQ against the Suggest service. Not a payment error despite the 402 code —
+    Cotality returns it when the (deliberately reduced) sandbox dataset has no match. The FAQ also
+    notes Suggest uses "starts with" logic with no fuzzy matching.
+  remediation: >-
+    Use one of the published sandbox suburbs/properties (see sandbox/corelogic-au-sandbox.yml) and
+    supply an address prefix that matches exactly from the first character.
+  source: faq
+- status: 403
+  title: Forbidden
+  description: The client does not have access rights to the requested content.
+  source: standards-and-conventions
+- status: 404
+  title: Not Found
+  description: Requested resource or API path does not exist.
+  source: standards-and-conventions
+  known_messages:
+  - message: 'Unable to identify proxy for host: star.corelogic.asia and url: /'
+    envelope: apigee-fault
+    errorcode: messaging.adaptors.http.flow.ApplicationNotFound
+    meaning: >-
+      The legacy Apigee gateway could not route the host/path pair to a proxy — returned for any
+      unrouted path on api.corelogic.asia, including /$metadata and /openapi.json.
+    observed: 'live probe 2026-07-26'
+- status: 429
+  title: Too Many Requests
+  description: Sandbox quota or rate limit has been exceeded, retry with backoff.
+  remediation: >-
+    Back off and retry. There are no published Retry-After or X-RateLimit headers; the sandbox
+    quota is not numerically published.
+  source: standards-and-conventions
+- status: 5xx
+  title: Server or Network Error
+  description: Server or network unavailable.
+  source: standards-and-conventions
+data_quality_conditions:
+- condition: Saved property identifiers stop resolving
+  documented_causes:
+  - Property has been deduplicated
+  - Property has been made obsolete
+  - Property was split or merged
+  remediation: >-
+    Re-resolve the address through the Address Matcher or Suggest service rather than persisting a
+    property id indefinitely.
+  source: faq
+support:
+  email: api.support@corelogic.com
+  contact_page: https://developer.corelogic.asia/contact-us
