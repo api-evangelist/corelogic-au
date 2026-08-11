@@ -546,6 +546,8 @@ apis:
   - type: Documentation
     url: https://developer.corelogic.asia/guides/environment-details
 common:
+- type: MCPServer
+  url: mcp/corelogic-au-mcp.yml
 - type: DomainSecurity
   url: security/corelogic-au-domain-security.yml
 - type: Website
