@@ -4,19 +4,16 @@ status: published
 status_raw: published-parent-scope
 australian_surface: false
 pointer_wired: false
-source: >-
-  https://www.cotality.com/platforms/mcp-server and
-  https://www.cotality.com/press-releases/cotality-launches-a-universal-ai-connector-mcp-server-and-ai-ready-property-intelligence
-finding: >-
-  The parent company launched a Cotality MCP Server on 31 March 2026 — a real product, built on the
-  open Model Context Protocol, positioned as "the universal AI connector for property intelligence"
-  and marketed as a bridge between ChatGPT / Claude / Gemini and Cotality's property data core.
-  It is recorded here because it is the company's agent surface, but it is NOT an Australian
-  surface: every data asset the product page lists is a United States dataset, the developer
-  portal for the Australian and New Zealand APIs (developer.corelogic.asia) never mentions MCP,
-  and no endpoint URL, tools/list manifest, transport, or authentication contract is published
-  anonymously anywhere. Because of that, no `type: MCPServer` pointer is wired on this Australian
-  repo — doing so would credit CoreLogic Australia with an agent surface it does not serve.
+source: https://www.cotality.com/platforms/mcp-server and https://www.cotality.com/press-releases/cotality-launches-a-universal-ai-connector-mcp-server-and-ai-ready-property-intelligence
+finding: 'The parent company launched a Cotality MCP Server on 31 March 2026 — a real product, built on
+  the open Model Context Protocol, positioned as "the universal AI connector for property intelligence"
+  and marketed as a bridge between ChatGPT / Claude / Gemini and Cotality''s property data core. It is
+  recorded here because it is the company''s agent surface, but it is NOT an Australian surface: every
+  data asset the product page lists is a United States dataset, the developer portal for the Australian
+  and New Zealand APIs (developer.corelogic.asia) never mentions MCP, and no endpoint URL, tools/list
+  manifest, transport, or authentication contract is published anonymously anywhere. Because of that,
+  no `type: MCPServer` pointer is wired on this Australian repo — doing so would credit CoreLogic Australia
+  with an agent surface it does not serve.'
 server:
   name: Cotality MCP Server
   vendor: Cotality (CoreLogic, Inc.)
@@ -29,9 +26,8 @@ server:
 data_assets_published:
 - name: CLIP (Core Logic Integrated Property identifier)
   scope: United States
-  note: >-
-    The persistent US property identifier. The Australian APIs use an unrelated opaque numeric
-    CoreLogic property identifier and no CLIP.
+  note: The persistent US property identifier. The Australian APIs use an unrelated opaque numeric CoreLogic
+    property identifier and no CLIP.
 - name: Property Characteristics
   scope: United States
   note: product page describes it as "Comprehensive U.S. property data"
@@ -42,32 +38,34 @@ data_assets_published:
 - name: Climate Risk Analytics - Chronic Perils
   scope: United States
 positioning_verbatim:
-- >-
-  "Cotality's Model Context Protocol (MCP) Server provides AI models and autonomous agents with
-  secure, instant access to verified property and location intelligence, ensuring your generative
-  outputs are fact-based and reliable. Built on the open MCP standard, it acts as a universal
-  bridge between leading systems like ChatGPT, Claude, and Gemini and Cotality's multi-source data
-  repository."
-- >-
-  "The Universal AI Plug (MCP): Securely connect your AI model of choice to real-time CLIP IDs,
-  property details, climate risk assessments, and market trends with our native MCP server."
-- >-
-  "22,000+ verified property and public record data sources fueling the platform"; "4 core assets
-  high-fidelity data assets immediately available via the server"
+- '"Cotality''s Model Context Protocol (MCP) Server provides AI models and autonomous agents with secure,
+  instant access to verified property and location intelligence, ensuring your generative outputs are
+  fact-based and reliable. Built on the open MCP standard, it acts as a universal bridge between leading
+  systems like ChatGPT, Claude, and Gemini and Cotality''s multi-source data repository."'
+- '"The Universal AI Plug (MCP): Securely connect your AI model of choice to real-time CLIP IDs, property
+  details, climate risk assessments, and market trends with our native MCP server."'
+- '"22,000+ verified property and public record data sources fueling the platform"; "4 core assets high-fidelity
+  data assets immediately available via the server"'
 related_ai_readiness:
-  ai_ready_data: >-
-    Cotality ships Property 360 datasets with companion YAML semantic files following the Open
-    Semantic Interchange (OSI) standard, described as a "translator" so AI systems understand field
-    meaning. Announced alongside the MCP server; again US-first. Australian equivalent page:
-    https://www.cotality.com/au/our-data/ai-ready-data (marketing only, no artifacts).
+  ai_ready_data: 'Cotality ships Property 360 datasets with companion YAML semantic files following the
+    Open Semantic Interchange (OSI) standard, described as a "translator" so AI systems understand field
+    meaning. Announced alongside the MCP server; again US-first. Australian equivalent page: https://www.cotality.com/au/our-data/ai-ready-data
+    (marketing only, no artifacts).'
   au_page: https://www.cotality.com/au/our-data/ai-ready-data
 tools: []
-tools_note: >-
-  No tool list, no inputSchema and no manifest has been published. Nothing is derived here: the
-  Australian estate has no anonymously retrievable OpenAPI to derive candidate tools from, so a
-  candidate tool list would be fabrication.
+tools_note: 'No tool list, no inputSchema and no manifest has been published. Nothing is derived here:
+  the Australian estate has no anonymously retrievable OpenAPI to derive candidate tools from, so a candidate
+  tool list would be fabrication.'
 cross_reference:
   us_repo: all/corelogic
-  note: >-
-    The United States / global CoreLogic (Cotality) entity is profiled separately. The MCP server
+  note: The United States / global CoreLogic (Cotality) entity is profiled separately. The MCP server
     belongs to that surface.
+deployment:
+  mode: none
+  endpoint: https://www.cotality.com/platforms/mcp-server
+  verified: probed
+  probe: dead
+  note: the endpoint this manifest claimed did not answer; recorded as none rather than deleted so the
+    claim stays auditable
+  checked: '2026-08-12'
+  source: catalog MCP census
