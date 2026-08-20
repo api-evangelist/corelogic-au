@@ -23,6 +23,21 @@ description: >-
   Universal Property Identifier appears anywhere in the Australian developer portal.
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/corelogic-au.png
 tags:
+- Real-Estate
+- Australia
+- Property Data
+- Valuation
+- AVM
+- PropTech
+- Property Listings
+- Rentals
+- Auction Data
+- Commercial Real Estate
+- Mortgage
+- Land Registry
+- Cotality
+- RP Data
+tags_raw:
 - Real Estate
 - Australia
 - Property Data
@@ -54,6 +69,9 @@ apis:
   humanURL: https://developer.corelogic.asia/guides/api-authentication
   baseURL: https://access.api.cotality.com.au
   tags:
+  - Authentication
+  - JWT
+  tags_raw:
   - Authentication
   - OAuth 2.0
   - JWT
@@ -229,6 +247,10 @@ apis:
   baseURL: https://property-timeline.api.cotality.com.au
   tags:
   - Property Data
+  - Timelines
+  - Building Consents
+  tags_raw:
+  - Property Data
   - Timeline
   - Building Consents
   properties:
@@ -269,6 +291,11 @@ apis:
     none is asserted here.
   humanURL: https://developer.corelogic.asia/apis/psx-apis/psx-get-order
   tags:
+  - Valuation
+  - Valuation Ordering
+  - Mortgage
+  - Workflows
+  tags_raw:
   - Valuation
   - Valuation Ordering
   - Mortgage
@@ -488,6 +515,9 @@ apis:
   humanURL: https://developer.corelogic.asia/guides/environment-details
   baseURL: https://notification.api.cotality.com.au
   tags:
+  - Notification
+  - Alerts
+  tags_raw:
   - Notifications
   - Alerts
   properties:
