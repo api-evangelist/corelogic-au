@@ -21,6 +21,17 @@ description: >-
   not to this Australian surface. The Australian APIs are proprietary REST/JSON over an Apigee
   gateway with OAuth 2.0 client credentials; no OData $metadata, no RESO endpoint, and no RESO
   Universal Property Identifier appears anywhere in the Australian developer portal.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/corelogic-au.png
 tags:
 - Real-Estate
