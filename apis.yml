@@ -710,3 +710,5 @@ common:
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
+x-parent: corelogic
+x-relationship: product
