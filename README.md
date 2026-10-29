@@ -1,4 +1,4 @@
-# CoreLogic Australia (corelogic-au)
+# CoreLogic Australia
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -66,266 +66,141 @@
 
 CoreLogic Australia — trading as Cotality since the 2025 global rebrand, and operating the RP Data platform through RP Data Pty Ltd — is the dominant independent property data, analytics and valuation provider in Australia and New Zealand. It sits in the middle of the Australian property value chain: it aggregates state land-registry and valuer-general records, agent and portal listing campaigns, auction results and rental campaigns into a single property spine, then sells that spine back to banks, mortgage brokers, valuers, insurers, agents and government. Its commercial products include the RP Data / RP Professional desktop, the IntelliVal automated valuation model, the CoreLogic Home Value Index, Cordell construction cost data, Cityscope commercial property data, and the PSX valuation ordering exchange. Its API posture is genuinely developer-facing but commercially licensed: a live Backstage-based Cotality Developer Portal at developer.corelogic.asia offers self-serve signup and self-serve creation of sandbox OAuth clients against a deliberately restricted evaluation dataset with request quotas, while every production API host in the *.api.cotality.com.au family answers 401 "Access token is missing" and requires a signed commercial data licence. Australia has no MLS and no RESO mandate — CoreLogic's RESO Web API and Data Dictionary certifications belong to Trestle, its United States MLS platform, not to this Australian surface. The Australian APIs are proprietary REST/JSON over an Apigee gateway with OAuth 2.0 client credentials; no OData $metadata, no RESO endpoint, and no RESO Universal Property Identifier appears anywhere in the Australian developer portal.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/corelogic-au/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/corelogic-au/refs/heads/main/apis.yml)
+**Areas:** Real Estate · Australia · Property Data · Valuation · AVM · PropTech · Property Listings · Rentals · Auction Data · Commercial Real Estate · Mortgage · Land Registry
 
-## Tags
+## CoreLogic Australia on APIs.io
 
-- Real Estate
-- Australia
-- Property Data
-- Valuation
-- AVM
-- PropTech
-- Property Listings
-- Rentals
-- Auction Data
-- Commercial Real Estate
-- Mortgage
-- Land Registry
-- Cotality
-- RP Data
+Everything profiled for CoreLogic Australia is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/corelogic-au/](https://apis.io/providers/corelogic-au/)** — or go straight to one of the APIs or properties below.
 
-## Timestamps
+### APIs (26)
 
-- **Created:** 2026-07-26
-- **Modified:** 2026-07-26
+- [CoreLogic Australia Access API](https://apis.io/apis/corelogic-au/corelogic-au-access-api/) — OAuth 2.0 token service for every Cotality Australia and New Zealand API. Issues JWT access tokens via client_credentials, authorization_code and…
+- [CoreLogic Australia Property Details API](https://apis.io/apis/corelogic-au/corelogic-au-property-details-api/) — Per-property record retrieval keyed on the CoreLogic property identifier — core and additional attributes, site detail, features, occupancy, sales history…
+- [CoreLogic Australia Property Services API](https://apis.io/apis/corelogic-au/corelogic-au-property-services-api/) — The older versioned property services family — comparables, geo sales search by polygon, locality, postcode and street, property and parcel suggest, point…
+- [CoreLogic Australia Search API](https://apis.io/apis/corelogic-au/corelogic-au-search-api/) — Property search and address matching across Australia — radius search by latitude/longitude, and filtered search by council area, locality, postcode and…
+- [CoreLogic Australia AVM API](https://apis.io/apis/corelogic-au/corelogic-au-avm-api/) — IntelliVal automated valuation model — the valuation engine at the centre of CoreLogic Australia's mortgage and lending business. The sandbox collection…
+- [CoreLogic Australia Auction API](https://apis.io/apis/corelogic-au/corelogic-au-auction-api/) — Australian auction results and clearance rates — the weekly number the Australian property press runs on. Publishes state-level summaries and results with…
+- [CoreLogic Australia Statistics API](https://apis.io/apis/corelogic-au/corelogic-au-statistics-api/) — Suburb, locality and region statistics plus ABS census summaries, driven by location and location-type identifiers and metric-type identifiers. Four…
+- [CoreLogic Australia Charts API](https://apis.io/apis/corelogic-au/corelogic-au-charts-api/) — Server-rendered PNG chart images for market trends and census data, driven by location, property-type and metric-type identifiers with extensive…
+- [CoreLogic Australia Property Timeline API](https://apis.io/apis/corelogic-au/corelogic-au-property-timeline-api/) — Chronological event timeline for a single property — sales, listing campaigns, rental campaigns and, with the withBuildingConsents flag, building consent…
+- [CoreLogic Australia Content API](https://apis.io/apis/corelogic-au/corelogic-au-content-api/) — Serves the legal disclaimers that licensees are contractually required to display alongside CoreLogic data, retrieved by disclaimer key (for example…
+- [CoreLogic Australia PSX API](https://apis.io/apis/corelogic-au/corelogic-au-psx-api/) — PSX is CoreLogic Australia's valuation ordering exchange, connecting lenders and brokers to panels of licensed valuers. The Cotality Developer Portal…
+- [CoreLogic Australia Commercial API](https://apis.io/apis/corelogic-au/corelogic-au-commercial-api/) — Commercial property data delivered into a licensee's own systems — market research, commercial valuations and comparable sales analysis, sharing the…
+- [CoreLogic Australia Construction API](https://apis.io/apis/corelogic-au/corelogic-au-construction-api/) — Live Cordell construction cost and project intelligence — project activity, builder profiles and contact information — delivered into customer-facing…
+- [CoreLogic Australia Insurance API](https://apis.io/apis/corelogic-au/corelogic-au-insurance-api/) — Insurance-facing property data service. Named and hosted in the Cotality Developer Portal environment-details guide, and included in the sandbox at…
+- [CoreLogic Australia Property Risk API](https://apis.io/apis/corelogic-au/corelogic-au-property-risk-api/) — Property risk services — the API behind Cotality's Australian hazard and resilience products. Named and hosted in the environment-details guide (sandbox…
+- [CoreLogic Australia Places API](https://apis.io/apis/corelogic-au/corelogic-au-places-api/) — Places of interest attached to a property. The portal FAQ is explicit about its scope — "Currently, only Schools and School Catchments are available" — and…
+- [CoreLogic Australia Location Search API](https://apis.io/apis/corelogic-au/corelogic-au-location-search-api/) — Location search services — the successor surface for resolving the locality, postcode, street, council-area and state identifiers every Cotality search,…
+- [CoreLogic Australia Property Bureau API](https://apis.io/apis/corelogic-au/corelogic-au-property-bureau-api/) — Property Bureau service. Named and hosted in the Cotality Developer Portal environment-details guide and included in the sandbox at…
+- [CoreLogic Australia AVM Report API](https://apis.io/apis/corelogic-au/corelogic-au-avm-report-api/) — Report rendering for IntelliVal automated valuations — the document form of the AVM number rather than the raw estimate. Named and hosted in the…
+- [CoreLogic Australia Property Profile Report API](https://apis.io/apis/corelogic-au/corelogic-au-property-profile-report-api/) — Property profile report generation — the API behind Cotality's Australian property, suburb and investment report products. Named and hosted in the…
+- [CoreLogic Australia Reporting API](https://apis.io/apis/corelogic-au/corelogic-au-reporting-api/) — Reporting services. Named and hosted in the Cotality Developer Portal environment-details guide and included in the sandbox at…
+- [CoreLogic Australia Property Monitor API](https://apis.io/apis/corelogic-au/corelogic-au-property-monitor-api/) — Property monitoring — watch a property or portfolio for change. Named and hosted in the environment-details guide, and explicitly excluded from the sandbox…
+- [CoreLogic Australia Notification API](https://apis.io/apis/corelogic-au/corelogic-au-notification-api/) — Notification services. Named and hosted in the environment-details guide and excluded from the sandbox alongside Property Monitor; probed anonymously on…
+- [CoreLogic Australia Owner Verification API](https://apis.io/apis/corelogic-au/corelogic-au-owner-verification-api/) — Property owner verification services. Named and hosted in the environment-details guide and excluded from the sandbox ("Property Owner Verification"), so it…
+- [CoreLogic Australia Update API](https://apis.io/apis/corelogic-au/corelogic-au-update-api/) — Update services — the write-shaped surface of the Cotality Australian estate. Named and hosted in the environment-details guide and excluded from the…
+- [CoreLogic Australia Cordell Sum Sure API](https://apis.io/apis/corelogic-au/corelogic-au-cordell-sum-sure-api/) — Cordell Sum Sure — building and contents rebuild-cost estimation, the calculator Australian insurers and brokers use for sum-insured adequacy. Named and…
 
-## APIs
+### Published properties
 
-### CoreLogic Australia Access API
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-OAuth 2.0 token service for every Cotality Australia and New Zealand API. Issues JWT access tokens via client_credentials, authorization_code and refresh_token grants. The developer portal documents POST https://access.api.cotality.com.au/as/token.oauth2 and POST https://access.api.cotality.com.au/oauth/token with HTTP Basic (base64 client_id:client_secret); the published sandbox collection shows the equivalent GET https://api.corelogic.asia/access/oauth/token?grant_type=client_credentials. Probed anonymously on 2026-07-26 and returned HTTP 401 unauthorized.
+#### AsyncAPI (1)
 
-- **Human URL:** [https://developer.corelogic.asia/guides/api-authentication](https://developer.corelogic.asia/guides/api-authentication)
-- **Base URL:** `https://access.api.cotality.com.au`
+Event-driven and webhook contracts.
 
-#### Tags
+- [Corelogic Au Psx Webhooks](https://apis.io/asyncapis/corelogic-au/corelogic-au-psx-webhooks/)
 
-- Authentication
-- OAuth 2.0
-- JWT
+#### MCP servers (1)
 
-#### Properties
+Model Context Protocol servers that expose the API to agents.
 
-- [Documentation](https://developer.corelogic.asia/guides/api-authentication)
-- [Documentation](https://developer.corelogic.asia/guides/application-silent-login)
-- [Postman Collection](collections/corelogic-au-rp-inside-auth-example.postman_collection.json)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
+- [Cotality MCP Server](https://apis.io/servers/corelogic-au/cotality-mcp-server/)
 
-### CoreLogic Australia Property Details API
+#### Security (3)
 
-Per-property record retrieval keyed on the CoreLogic property identifier — core and additional attributes, site detail, features, occupancy, sales history and last sale, on-the-market sales and rental campaigns, marketing contacts, and property photos. Thirteen operations are published in the CoreLogic APIs AU Sample Sandbox Collection under /au/properties/{propertyId}/*. Production host probed anonymously on 2026-07-26 and returned HTTP 401 "Access token is missing".
+Authentication, trust centre, and vulnerability disclosure.
 
-- **Human URL:** [https://developer.corelogic.asia/apis](https://developer.corelogic.asia/apis)
-- **Base URL:** `https://property-details.api.cotality.com.au`
+- [Corelogic Au Authentication](https://apis.io/security/corelogic-au/corelogic-au-authentication/)
+- [Corelogic Au Domain Security](https://apis.io/security/corelogic-au/corelogic-au-domain-security/)
+- [Corelogic Au Vulnerability Disclosure](https://apis.io/security/corelogic-au/corelogic-au-vulnerability-disclosure/)
 
-#### Tags
+#### OAuth scopes (1)
 
-- Property Data
-- Property Records
-- Sales History
-- Rentals
+The permissions the API asks for.
 
-#### Properties
+- [Corelogic Au Scopes](https://apis.io/scopes/corelogic-au/corelogic-au-scopes/)
 
-- [Documentation](https://developer.corelogic.asia/apis)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
+#### Rate limits (1)
 
-### CoreLogic Australia Property Services API
+Published request limits.
 
-The older versioned property services family — comparables, geo sales search by polygon, locality, postcode and street, property and parcel suggest, point search, for-sale and for-rent advertisements, property pros-and-cons, marketing contacts, and property validation. Thirty-one operations are published in the sandbox collection under /au/v1/* and /au/v2/*. The collection references this family through unresolved Postman variables, so no production base URL is asserted here; the suggest and address-matcher hosts suggest.api.cotality.com.au and matcher.api.cotality.com.au both resolve and answered HTTP 401 on 2026-07-26.
+- [Corelogic Au Rate Limits](https://apis.io/rate-limits/corelogic-au/corelogic-au-rate-limits/)
 
-- **Human URL:** [https://developer.corelogic.asia/apis](https://developer.corelogic.asia/apis)
+## Where to find this API
 
-#### Tags
-
-- Property Search
-- Comparables
-- Geo Search
-- Address Matching
-
-#### Properties
-
-- [Documentation](https://developer.corelogic.asia/apis)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
-
-### CoreLogic Australia Search API
-
-Property search and address matching across Australia — radius search by latitude/longitude, and filtered search by council area, locality, postcode and street, each in four flavours (current attributes, last sale, on-the-market for rent, on-the-market for sale), plus the Address Matcher service that resolves a free-text address to a CoreLogic property identifier. Twenty-two operations are published in the sandbox collection. Production host probed anonymously on 2026-07-26 and returned HTTP 401 "Access token is missing".
-
-- **Human URL:** [https://developer.corelogic.asia/address_matcher](https://developer.corelogic.asia/address_matcher)
-- **Base URL:** `https://search.api.cotality.com.au`
-
-#### Tags
-
-- Property Search
-- Address Matching
-- Geo Search
-- Property Listings
-
-#### Properties
-
-- [Documentation](https://developer.corelogic.asia/address_matcher)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
-
-### CoreLogic Australia AVM API
-
-IntelliVal automated valuation model — the valuation engine at the centre of CoreLogic Australia's mortgage and lending business. The sandbox collection publishes consumer and origination AVM variants, current and historical point-in-time valuations (/au/properties/{id}/avm/intellival/{variant}/{date}), a live AVM POST (/liveavm/intellival/consumer) and a banded live AVM (/liveavm/intellival/consumer/band), with a roundTo parameter. Production host probed anonymously on 2026-07-26 and returned HTTP 401 "Access token is missing".
-
-- **Human URL:** [https://developer.corelogic.asia/apis](https://developer.corelogic.asia/apis)
-- **Base URL:** `https://avm.api.cotality.com.au`
-
-#### Tags
-
-- AVM
-- Valuation
-- Mortgage
-- IntelliVal
-
-#### Properties
-
-- [Documentation](https://developer.corelogic.asia/apis)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
-
-### CoreLogic Australia Auction API
-
-Australian auction results and clearance rates — the weekly number the Australian property press runs on. Publishes state-level summaries and results with capital-city filtering, suburb and postcode detail, clearance-rate statistics, multi-week windows, date-range search and year-on-year comparison. Thirteen operations are published in the sandbox collection. Production host probed anonymously on 2026-07-26 and returned HTTP 401 "Access token is missing".
-
-- **Human URL:** [https://developer.corelogic.asia/apis](https://developer.corelogic.asia/apis)
-- **Base URL:** `https://auction.api.cotality.com.au`
-
-#### Tags
-
-- Auction Data
-- Clearance Rate
-- Market Data
-
-#### Properties
-
-- [Documentation](https://developer.corelogic.asia/apis)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
-
-### CoreLogic Australia Statistics API
-
-Suburb, locality and region statistics plus ABS census summaries, driven by location and location-type identifiers and metric-type identifiers. Four operations are published in the sandbox collection, including POST /v1/statistics.json and the census summary service. Production host probed anonymously on 2026-07-26 and returned HTTP 401 "Access token is missing".
-
-- **Human URL:** [https://developer.corelogic.asia/metrics](https://developer.corelogic.asia/metrics)
-- **Base URL:** `https://statistics.api.cotality.com.au`
-
-#### Tags
-
-- Market Data
-- Statistics
-- Census
-
-#### Properties
-
-- [Documentation](https://developer.corelogic.asia/metrics)
-- [Documentation](https://developer.corelogic.asia/metrics/census)
-- [Documentation](https://developer.corelogic.asia/metrics/marketTrends)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
-
-### CoreLogic Australia Charts API
-
-Server-rendered PNG chart images for market trends and census data, driven by location, property-type and metric-type identifiers with extensive presentation parameters (chart size, colours, titles, axis labels, marker radius, grid line style, date range, multi-series). Four operations are published in the sandbox collection. Production host probed anonymously on 2026-07-26 and returned HTTP 401 "Access token is missing".
-
-- **Human URL:** [https://developer.corelogic.asia/explore_charts_customisation](https://developer.corelogic.asia/explore_charts_customisation)
-- **Base URL:** `https://charts.api.cotality.com.au`
-
-#### Tags
-
-- Charts
-- Market Data
-- Data Visualization
-
-#### Properties
-
-- [Documentation](https://developer.corelogic.asia/explore_charts_customisation)
-- [Documentation](https://developer.corelogic.asia/guides/charts-customisation)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
-
-### CoreLogic Australia Property Timeline API
-
-Chronological event timeline for a single property — sales, listing campaigns, rental campaigns and, with the withBuildingConsents flag, building consent events. Three operations are published in the sandbox collection under /au/properties/{id}/timeline. Production host probed anonymously on 2026-07-26 and returned HTTP 401 "Access token is missing".
-
-- **Human URL:** [https://developer.corelogic.asia/apis](https://developer.corelogic.asia/apis)
-- **Base URL:** `https://property-timeline.api.cotality.com.au`
-
-#### Tags
-
-- Property Data
-- Timeline
-- Building Consents
-
-#### Properties
-
-- [Documentation](https://developer.corelogic.asia/apis)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
-
-### CoreLogic Australia Content API
-
-Serves the legal disclaimers that licensees are contractually required to display alongside CoreLogic data, retrieved by disclaimer key (for example /legal/disclaimers/auction_au and /legal/disclaimers/auction_standalone_au). It is also the host of the only anonymously readable machine-readable artifact CoreLogic Australia publishes: the RP.Inside authentication Postman collection at https://api.corelogic.asia/content/docs/public/deep-link-postman.json, fetched HTTP 200 on 2026-07-26. The production host probed anonymously on the same date and returned HTTP 401 "Access token is missing".
-
-- **Human URL:** [https://developer.corelogic.asia/apis](https://developer.corelogic.asia/apis)
-- **Base URL:** `https://content.api.cotality.com.au`
-
-#### Tags
-
-- Content
-- Legal
-- Disclaimers
-
-#### Properties
-
-- [Documentation](https://developer.corelogic.asia/apis)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
-
-### CoreLogic Australia PSX API
-
-PSX is CoreLogic Australia's valuation ordering exchange, connecting lenders and brokers to panels of licensed valuers. The Cotality Developer Portal defines nine documented PSX operations — panel lookup, subscribe, pull notifications, expanded search, get order, update order, cancel, attach or retrieve documents, and set retrieved — plus a PSX implementation guide with quote, pre-ordering, ordering and valuation workflow diagrams. No base URL is published outside the authenticated portal, and no sample collection for PSX is public, so none is asserted here.
-
-- **Human URL:** [https://developer.corelogic.asia/apis/psx-apis/psx-get-order](https://developer.corelogic.asia/apis/psx-apis/psx-get-order)
-
-#### Tags
-
-- Valuation
-- Valuation Ordering
-- Mortgage
-- Workflow
-
-#### Properties
-
-- [Documentation](https://developer.corelogic.asia/guides/psx-implementation)
-- [Documentation](https://developer.corelogic.asia/apis/psx-apis/psx-panel-lookup)
-- [Documentation](https://developer.corelogic.asia/apis/psx-apis/psx-subscribe)
-- [Documentation](https://developer.corelogic.asia/apis/psx-apis/psx-pull-notifications)
-- [Documentation](https://developer.corelogic.asia/apis/psx-apis/psx-expanded-search)
-- [Documentation](https://developer.corelogic.asia/apis/psx-apis/psx-get-order)
-- [Documentation](https://developer.corelogic.asia/apis/psx-apis/psx-update-order)
-- [Documentation](https://developer.corelogic.asia/apis/psx-apis/psx-cancel)
-- [Documentation](https://developer.corelogic.asia/apis/psx-apis/psx-attach-or-retrieve-documents)
-- [Documentation](https://developer.corelogic.asia/apis/psx-apis/psx-set-retrieved)
-
-## Common Properties
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://www.cotality.com/au)
-- [Developer Portal](https://developer.corelogic.asia/)
 - [Documentation](https://developer.corelogic.asia/apis)
-- [Getting Started](https://developer.corelogic.asia/guides/quick-start)
-- [Sign Up](https://developer.corelogic.asia/signup)
-- [Login](https://developer.corelogic.asia/user/register)
-- [Authentication](https://developer.corelogic.asia/guides/api-authentication)
-- [Well-Known](https://auth.corelogic.asia/.well-known/openid-configuration)
-- [Conventions](https://developer.corelogic.asia/guides/standards-and-conventions)
-- [Sandbox](https://developer.corelogic.asia/guides/sandbox-test-data)
+- [Getting started](https://developer.corelogic.asia/guides/quick-start)
+- [API reference](https://developer.corelogic.asia/apis)
+- [Sign up](https://developer.corelogic.asia/signup)
 - [Support](https://developer.corelogic.asia/contact-us)
-- [FAQ](https://developer.corelogic.asia/faq)
-- [Terms of Service](https://developer.corelogic.asia/terms-and-conditions)
-- [Privacy Policy](https://developer.corelogic.asia/legal/privacy-policy)
-- [Postman Collection](collections/corelogic-au-sample-sandbox.postman_collection.json)
-- [Postman Collection](collections/corelogic-au-rp-inside-auth-example.postman_collection.json)
-- [LinkedIn](https://www.linkedin.com/company/cotality)
+- [Blog](https://www.cotality.com/au/insights)
+- [Security](https://www.cotality.com/security)
+- [Terms of service](https://developer.corelogic.asia/terms-and-conditions)
+- [Privacy policy](https://developer.corelogic.asia/legal/privacy-policy)
 
-## Maintainers
+## API Evangelist rating
 
-- **Kin Lane** — kin@apievangelist.com
+**Kin Score 29.3** — thin · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 39.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 18.4 |
+| Developer ergonomics | 18.5 |
+| Access clarity | 6.6 |
+
+**Agent readiness 26.1** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 32.4** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/corelogic-au/](https://apis.io/providers/corelogic-au/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for CoreLogic Australia: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/corelogic-au/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
